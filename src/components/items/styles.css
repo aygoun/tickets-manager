@@ -3,14 +3,41 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    padding: 1rem;
 }
-.header-img-logo-festival{
-    max-width: 100px;
-    max-height: 100px;
+.header-img-logo-container{
     flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.header-img-logo{
+    max-width: 80px;
+    max-height: 80px;
 }
 .header-title{
-    font-size: 2rem;
+    font-size: 1.8rem;
     flex: 1;
     margin-left: 1rem;
+    font-weight: 700;
+    color: white;
+}
+.header-logout-link{
+    font-size: 1.2rem;
+    color: white;
+    margin-left: 1rem;
+    cursor: pointer;
+}
+.header-logout-a{
+    background-color: black;
+    padding: 1rem;
+    border-radius: 5px;
+    color: white;
+    text-decoration: none;
+}
+.header-logout-a:hover {
+    background-color: rgb(49, 49, 49);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    padding: 1rem;
+    border-radius: 5px;
 }

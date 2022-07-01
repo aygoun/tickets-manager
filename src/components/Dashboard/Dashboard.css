@@ -1,0 +1,26 @@
+.dashboard-container{
+    margin-top: 1rem;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+.dashboard-header-content{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.dashboard-content-header-title{
+    flex: 1;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.dashboard-content-header-newTicketButton{
+    flex: 1;
+    align-self: flex-end;
+    max-width: 40px!important;
+    height: 40px!important;
+}
+.dashboard-content-title{
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+}

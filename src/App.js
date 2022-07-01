@@ -5,6 +5,8 @@ import {
   Route,
 } from "react-router-dom";
 import Login from "./components/Login/Login";
+import Dashboard from './components/Dashboard/Dashboard';
+import NewTicket from './components/NewTicket/NewTicket';
 
 
 function App() {
@@ -13,9 +15,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          {/*<Route path="/admin" element={<AdminDashboard />}/>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-ticket" element={<NewTicket />} />*/}
+          {/*<Route path="/admin" element={<AdminDashboard />}/>*/}
+          <Route path="/new-ticket" element={<NewTicket />} />
         </Routes>
       </BrowserRouter>
     </div>
