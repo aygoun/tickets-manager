@@ -6,57 +6,39 @@
     flex-direction: column;
     align-items: center;
 }
-.newticket-ticket-header-container{
+.newticket-ticket-header-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    margin-bottom: 1rem;
-    width: 100vh;
-}
-.newticket-subject-input{
-    margin-left: 1rem;
+    margin-right: 1rem;
 }
 .flex1{
     flex: 1;
 }
+.newticket-tag-input-container{
+    width: 150px;
+}
+.newticket-subject-input-container{
+    margin-left: 1rem;
+    width: 400px;
+    flex-grow: 2;
+}
+.newticket-subject-input{
+    width: 100%!important;
+}
 .newticket-subcontainer{
-    border: 1px solid #000;
+    border: 1px solid rgb(187, 187, 187);
     border-radius: 5px;
     padding: 1rem;
+    width: 100%;
 }
 .newticket-body-input{
     margin-top: 1rem;
     margin-bottom: 1rem;
-    width: 95%;
+    width: 94%;
     height: 300px;
-}
-.newticket-submit-button-container {
-    border: 1px solid #000;
-    border-radius: 3px;
-    padding: 0.5rem;
-    width: 200px !important;
-    text-align: center;
-    background-color: #000 !important;
-    color: #fff!important;
-    font-weight: 700;
-}
-
-.newticket-submit-button-container:hover {
-    background-color: #fff !important;
-    color: #000!important;
-    font-weight: 700;
-}
-
-.newticket-submit-button {
-    text-decoration: none;
-    color: #fff!important;
-}
-.newticket-submit-button:hover{
-    color: #000!important;
-}
-.newticket-input{
-    padding: 0.5rem;
+    padding: 1rem;
 }
 .newticket-validate-button-container{
     display: flex;
@@ -64,12 +46,6 @@
     justify-content: space-between;
     align-items: center;
 }
-.newticket-cancel-text{
-    text-decoration: none;
-    font-weight: 700;
-    color: #000;
-    align-self: flex-end;
-}
 .newticket-cancel-button-flex-none{
-    flex: none;
+    align-self: flex-end;
 }

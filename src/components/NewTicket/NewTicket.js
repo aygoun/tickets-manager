@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../items/Header";
 import "./NewTicket.css";
 import { useNavigate } from "react-router-dom";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Button,
+} from "@mui/material";
 
 function NewTicket() {
   let navigate = useNavigate();
+
+  const [tag, setTag] = useState("");
 
   return (
     <div>
@@ -16,18 +26,27 @@ function NewTicket() {
           </div>
           <div className="newticket-ticket-header-container flex1">
             <div className="newticket-tag-input-container">
-              <input
-                type="text"
-                placeholder="TAG"
-                className="newticket-input"
-              />
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Tag</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={tag}
+                  label="Tag"
+                  onChange={(e) => setTag(e.target.value)}
+                >
+                  <MenuItem value={"Teams"}>Teams</MenuItem>
+                  <MenuItem value={"SecuTix"}>SecuTix</MenuItem>
+                  <MenuItem value={"Autre"}>Autre</MenuItem>
+                </Select>
+              </FormControl>
             </div>
             <div className="newticket-subject-input-container">
-              {" "}
-              <input
-                type="text"
-                placeholder="Sujet du ticket"
-                className="newticket-subject-input newticket-input"
+              <TextField
+                id="filled-basic"
+                label="Sujet"
+                variant="filled"
+                className="newticket-subject-input"
               />
             </div>
           </div>
@@ -36,19 +55,17 @@ function NewTicket() {
             <textarea
               type="text"
               placeholder="Remarques"
-              className="newticket-body-input newticket-input"
+              className="newticket-body-input"
             />
           </div>
           <div className="flex1 newticket-validate-button-container">
-            <div className="newticket-submit-button-container">
-              <a href="" className="newticket-submit-button">
-                Valider
-              </a>
+            <div className="flex1">
+              <Button variant="contained">Envoyer</Button>
             </div>
             <div className="newticket-cancel-button-flex-none">
-              <a href="#" className="newticket-cancel-text" onClick={() => navigate("/dashboard")}>
+              <Button variant="outlined" onClick={() => navigate("/dashboard")}>
                 Annuler
-              </a>
+              </Button>
             </div>
           </div>
         </div>

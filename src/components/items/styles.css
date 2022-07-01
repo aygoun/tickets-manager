@@ -38,6 +38,9 @@
 .header-logout-a:hover {
     background-color: rgb(49, 49, 49);
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    padding: 1rem;
-    border-radius: 5px;
+}
+.header-logout-img{
+    max-width: 30px;
+    max-height: 30px;
+    vertical-align: middle;
 }
