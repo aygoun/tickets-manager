@@ -1,15 +1,33 @@
 import "./styles.css";
 import React, { Component } from 'react';
+import { auth } from '../../firebase';
+import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.svg";
 
-export class Header extends Component {
-  render() {
-    return (
-      <div className="header-container">
-        <img src="https://festival-aix.com/sites/all/themes/flaix2019/assets/img/logo.svg" className="header-img-logo-festival"/>
+function Header(props) {
+  const isLogout = props.isLogout;
+  let navigate = useNavigate();
+
+  const handleLogOut = () => {
+    auth.signOut();
+    sessionStorage.clear();
+    navigate("/");
+  };
+  return (
+    <div className="header-container">
+      <div className="header-img-logo-container">
+        <img src={logo} className="header-img-logo" />
         <div className="header-title">| Ticket Manager</div>
       </div>
-    )
-  }
+      {isLogout && (
+        <div className="header-logout-link">
+          <a className="header-logout-a" onClick={handleLogOut}>
+            Deconnexion
+          </a>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default Header
+export default Header;
