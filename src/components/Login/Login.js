@@ -1,10 +1,20 @@
 import "./Login.css";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Header from "../items/Header";
 import { auth } from "../../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth"; 
+import {
+  signInWithEmailAndPassword,
+  getAuth,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 function Login() {
   let navigate = useNavigate();
@@ -12,12 +22,32 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClickOpen2 = () => {
+    setOpen2(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleClose2 = () => {
+    setOpen2(false);
+  };
+
   const handleSubmit = (e) => {
     const emailSplited = email.split("@");
-    if (email.length < 17 || password.length < 6 || emailSplited.length < 2 || emailSplited[1] != "festival-aix.com" ) { 
+    if (
+      email.length < 17 ||
+      password.length < 6 ||
+      emailSplited.length < 2 ||
+      emailSplited[1] != "festival-aix.com"
+    ) {
       alert("Veuillez remplir tous les champs");
-    }
-    else{
+    } else {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in
@@ -32,7 +62,22 @@ function Login() {
           const errorMessage = error.message;
           alert("An error occured: " + errorMessage);
         });
-    } 
+    }
+  };
+
+  const handleForgottenPassword = () => {
+    const auth = getAuth();
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent!
+        // ..
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      });
   };
   return (
     <div>
@@ -71,9 +116,65 @@ function Login() {
               </a>
             </div>
             <div>
-              <a href="#" className="login-form-first-connexion-a">
-                Première connexion ?
+              <a
+                href="#"
+                className="login-form-first-connexion-a login-form-validate-a"
+                onClick={handleClickOpen}
+              >
+                Mot de passe oublié ?
               </a>
+              <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Entrer votre email</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    Vous recevrez un mail pour modifier votre mot de passe.
+                  </DialogContentText>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="exemple@festival-aix.com"
+                    type="email"
+                    fullWidth
+                    variant="standard"
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>Annuler</Button>
+                  <Button onClick={handleClose}>Valider</Button>
+                </DialogActions>
+              </Dialog>
+            </div>
+            <div>
+              <Button
+                variant="outlined"
+                onClick={handleClickOpen2}
+                className="login-first-connection-button"
+              >
+                Première connexion ?
+              </Button>
+              <Dialog open={open2} onClose={handleClose2}>
+                <DialogTitle>Entrer votre email</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    Vous recevrez un mot de passe provisoire par email afin de
+                    vous authentifier.
+                  </DialogContentText>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="exemple@festival-aix.com"
+                    type="email"
+                    fullWidth
+                    variant="standard"
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose2}>Annuler</Button>
+                  <Button onClick={handleClose2}>Valider</Button>
+                </DialogActions>
+              </Dialog>
             </div>
           </div>
         </div>
@@ -82,4 +183,4 @@ function Login() {
   );
 }
 
-export default Login
+export default Login;

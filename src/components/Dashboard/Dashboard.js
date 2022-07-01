@@ -1,5 +1,5 @@
 import "./Dashboard.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import { auth } from "../../firebase";
 import plus from "../../assets/plus.png";
@@ -11,10 +11,17 @@ function Dashboard() {
 
   const userEmail = sessionStorage.getItem("userEmail");
   const [userTickets, setUserTickets] = useState([]);
+  const [noTickets, setNoTickets] = useState("");
 
   const handleNewTicket = () => {
     navigate("/new-ticket");
   };
+
+  useEffect(() => {
+    if (userTickets.length === 0) {
+      setNoTickets("Aucun ticket");
+    }
+  }, [userTickets]);
 
   return (
     <div>
@@ -32,13 +39,14 @@ function Dashboard() {
           </a>
         </div>
         <div className="dashboard-content-body">
-          <div className="dashboard-content-title">Anciens tickets</div>
+          <div className="dashboard-content-title">Anciens tickets :</div>
 
           <div>
-            {(userTickets && 
+            {userTickets &&
               userTickets.map((ticket, index) => (
                 <TicketDetail key={index} ticket={ticket} />
-              )))}
+              ))}
+            {<h3 align="center">{noTickets}</h3>}
             <hr />
           </div>
         </div>

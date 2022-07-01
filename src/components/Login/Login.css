@@ -35,9 +35,12 @@
 }
 .login-form-validate-a{
     text-decoration: none;
+    color: #000;
+    font-weight: 500;
 }
-.login-form-first-connexion-a{
-    text-decoration: none;
-    color: grey;
-    font-weight: 400;
+.login-first-connection-button{
+    width: 100%;
+    margin-top: 1rem!important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
 }

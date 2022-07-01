@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { auth } from '../../firebase';
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
+import signout from "../../assets/signout.png";
 
 function Header(props) {
   const isLogout = props.isLogout;
@@ -22,7 +23,8 @@ function Header(props) {
       {isLogout && (
         <div className="header-logout-link">
           <a className="header-logout-a" onClick={handleLogOut}>
-            Deconnexion
+            {/*Deconnexion*/}
+            <img src={signout} className="header-logout-img" />
           </a>
         </div>
       )}
