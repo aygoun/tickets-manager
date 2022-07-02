@@ -43,7 +43,7 @@ function Login() {
     if (
       email.length < 17 ||
       password.length < 6 ||
-      emailSplited.length < 2 ||
+      emailSplited.length != 2 ||
       emailSplited[1] != "festival-aix.com"
     ) {
       alert("Veuillez remplir tous les champs");

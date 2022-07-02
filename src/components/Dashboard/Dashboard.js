@@ -42,6 +42,7 @@ function Dashboard() {
           <div className="dashboard-content-title">Anciens tickets :</div>
 
           <div>
+          <TicketDetail />
             {userTickets &&
               userTickets.map((ticket, index) => (
                 <TicketDetail key={index} ticket={ticket} />
