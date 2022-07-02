@@ -1,3 +1,6 @@
+.flex1{
+    flex: 1;
+}
 .header-container{
     background-color: #F24329;
     display: flex;
@@ -43,4 +46,30 @@
     max-width: 30px;
     max-height: 30px;
     vertical-align: middle;
+}
+.ticket-preview-container{
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid rgb(217, 217, 217);
+    border-radius: 5px;
+}
+.ticket-preview-subcontainer{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.ticket-preview-tag-container{
+    flex-grow: 1!important;
+    font-weight: 700;
+}
+.ticket-preview-subject-container{
+    flex-grow: 4!important;
+}
+.ticket-preview-info-container{
+    flex-grow: 1!important;
+    align-self: flex-end!important;
+}
+.ticket-preview-info-img{
+    float: right;
 }
