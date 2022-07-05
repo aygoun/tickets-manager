@@ -7,6 +7,7 @@ import {
 import Login from "./components/Login/Login";
 import Dashboard from './components/Dashboard/Dashboard';
 import NewTicket from './components/NewTicket/NewTicket';
+import ViewTicket from './components/ViewTicket/ViewTicket';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/view-ticket:id" element={<ViewTicket />} />
           {/*<Route path="/admin" element={<AdminDashboard />}/>*/}
           <Route path="/new-ticket" element={<NewTicket />} />
         </Routes>

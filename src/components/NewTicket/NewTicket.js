@@ -11,27 +11,38 @@ import {
   Button,
 } from "@mui/material";
 import { db } from "../../firebase";
+import { doc, addDoc, collection, setDoc } from "firebase/firestore"; 
+import { v4 as uuidv4 } from "uuid";
+
 
 function NewTicket() {
   let navigate = useNavigate();
+  let email = sessionStorage.getItem("userEmail");
 
   const [tag, setTag] = useState("");
   const [resume, setResume] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    db.collection("tickets")
-      .add({
+  const handleSubmit = async () => {
+    console.log("TAG: " + tag);
+    console.log("Resume: " + resume);
+    console.log("Description: " + description);
+    if (tag !== "" || resume !== "" || description !== "") {
+      let id = uuidv4();
+      let data = {
         tag: tag,
-        resume: resume,
-        description: description,
-        createdAt: new Date(),
-      })
-      .then(() => {
-        navigate("/");
-      }
-      );
+        object: resume,
+        body: description,
+        date: new Date(),
+        status: "open",
+        from: email,
+        ticketID: id,
+      };
+      await setDoc(doc(db, "tickets", id), data);
+      navigate("/dashboard");
+    } else {
+      alert("Veuillez remplir tous les champs");
+    }
   };
 
   return (
