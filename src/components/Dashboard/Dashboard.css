@@ -25,3 +25,35 @@
     font-weight: 600;
     margin-bottom: 1rem;
 }
+.dashboard-content-body-subcontainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 1rem;
+}
+.dashboard-content-body-filtermenu{
+    flex: 1;
+    margin-right: 1rem;
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 100%;
+    background-color: #F24329;
+    color: #fff;
+}
+.dashboard-content-body-content-container{
+    flex: 1;
+    flex-grow: 4;
+}
+.dashboard-content-filter-choices{
+    border-bottom: 1px solid #ccc;
+    color: #fff;
+    padding: 0.5em;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.dashboard-content-body-menu{
+    text-decoration: none;
+}

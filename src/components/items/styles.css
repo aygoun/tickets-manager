@@ -66,10 +66,28 @@
 .ticket-preview-subject-container{
     flex-grow: 4!important;
 }
+.ticket-preview-info-status-container{
+    margin-right: 1rem;
+    background-color: black;
+    padding: 0.7rem;
+    font-weight: 700;
+    border-radius: 5px;
+    color: white;
+}
 .ticket-preview-info-container{
     flex-grow: 1!important;
     align-self: flex-end!important;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end!important;
+    align-items: center;
 }
 .ticket-preview-info-img{
     float: right;
+}
+.ticket-preview-close-img{
+    margin-right: 1rem;
+}
+.span-button{
+    cursor: pointer;
 }
