@@ -103,7 +103,9 @@ function ViewTicket() {
                   style={{
                     borderRadius: 35,
                     backgroundColor: "#000",
+                    color: "#fff",
                   }}
+                  disabled
                 >
                   {ticket.status}
                 </Button>

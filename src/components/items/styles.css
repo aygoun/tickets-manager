@@ -62,6 +62,7 @@
 .ticket-preview-tag-container{
     flex-grow: 1!important;
     font-weight: 700;
+    margin-right: 1rem;
 }
 .ticket-preview-subject-container{
     flex-grow: 4!important;
