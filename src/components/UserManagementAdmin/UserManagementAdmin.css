@@ -1,0 +1,34 @@
+.user-management-admin-container{
+    margin-top: 1rem;
+    margin-left: 5%!important;
+    margin-right: 5%!important;
+}
+.user-management-admin-sub-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.user-management-admin-items{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.user-management-admin-item-name{
+    flex: 1;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.user-management-admin-item-mail{
+    flex: 1;
+}
+.user-management-admin-item-delete{
+    flex: 1;
+    align-self: flex-end;
+    max-width: 40px!important;
+    height: 40px!important;
+}

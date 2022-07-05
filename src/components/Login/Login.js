@@ -148,33 +148,11 @@ function Login() {
             <div>
               <Button
                 variant="outlined"
-                onClick={handleClickOpen2}
+                onClick={() => navigate("/register")}
                 className="login-first-connection-button"
               >
                 Première connexion ?
               </Button>
-              <Dialog open={open2} onClose={handleClose2}>
-                <DialogTitle>Entrer votre email</DialogTitle>
-                <DialogContent>
-                  <DialogContentText>
-                    Vous recevrez un mot de passe provisoire par email afin de
-                    vous authentifier.
-                  </DialogContentText>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    label="exemple@festival-aix.com"
-                    type="email"
-                    fullWidth
-                    variant="standard"
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose2}>Annuler</Button>
-                  <Button onClick={handleClose2}>Valider</Button>
-                </DialogActions>
-              </Dialog>
             </div>
           </div>
         </div>

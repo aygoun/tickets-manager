@@ -11,7 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import { db } from "../../firebase";
-import { doc, addDoc, collection, setDoc } from "firebase/firestore"; 
+import { doc, addDoc, collection, setDoc, updateDoc, increment } from "firebase/firestore"; 
 import { v4 as uuidv4 } from "uuid";
 
 
@@ -27,18 +27,25 @@ function NewTicket() {
     console.log("TAG: " + tag);
     console.log("Resume: " + resume);
     console.log("Description: " + description);
-    if (tag !== "" || resume !== "" || description !== "") {
+    if (tag !== "" && resume !== "" && description !== "") {
       let id = uuidv4();
       let data = {
         tag: tag,
         object: resume,
         body: description,
         date: new Date(),
-        status: "open",
+        status: "Ouvert",
         from: email,
         ticketID: id,
       };
       await setDoc(doc(db, "tickets", id), data);
+
+      //Incremente the number of tickets in the user profile
+      const userRef = doc(db, "users", email);
+      await updateDoc(userRef, {
+          nbTickets: increment(1)
+      });
+
       navigate("/dashboard");
     } else {
       alert("Veuillez remplir tous les champs");

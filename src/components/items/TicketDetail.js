@@ -15,7 +15,7 @@ function TicketDetail(props) {
   const handleDelete = () => {
     console.log("HELLO: " + ticket.ticketID);
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    updateDoc(docRef, { status: "closed" });
+    updateDoc(docRef, { status: "Fermé" });
   };
 
   return (

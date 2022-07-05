@@ -1,4 +1,4 @@
-import "./Dashboard.css";
+import "./DashboardAdmin.css";
 import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import { auth, db } from "../../firebase";
@@ -13,9 +13,10 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
+import users from "../../assets/users.png";
 
 
-function Dashboard() {
+function DashboardAdmin() {
   let navigate = useNavigate();
 
   const userEmail = sessionStorage.getItem("userEmail");
@@ -25,10 +26,6 @@ function Dashboard() {
   const [closedNb, setClosedNb] = useState([]);
   const [affectedNb, setAffectedNb] = useState([]);
   const [suspendedNb, setSuspendedNb] = useState([]);
-
-  const handleNewTicket = () => {
-    navigate("/new-ticket");
-  };
 
   const fetchTickets = async () => {
     const q = query(collection(db, "tickets"), where("from", "==", userEmail), orderBy("date", "desc"));
@@ -85,18 +82,18 @@ function Dashboard() {
           <div className="dashboard-content-header-title">
             👋 Bonjour {userEmail} !
           </div>
-          <a href="#" onClick={handleNewTicket}>
+          <a href="" onClick={() => navigate("/users-management")} style={{marginRight: 25}}>
             <img
-              src={plus}
+              src={users}
               className="dashboard-content-header-newTicketButton"
             />
           </a>
         </div>
         <div className="dashboard-content-body">
-          <div className="dashboard-content-title">Mes tickets :</div>
+          <div className="dashboard-content-title">Tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
-              <span onClick={() => setUserTickets(openNb)} className="dashboard-content-body-menu" style={{borderTopLeft: "100px"}}>
+              <span onClick={() => setUserTickets(openNb)} className="dashboard-content-body-menu">
                 <div className="dashboard-content-filter-choices">OUVERT ({openNb.length})</div>
               </span>
               <span onClick={() => setUserTickets(affectedNb)} className="dashboard-content-body-menu">
@@ -125,4 +122,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default DashboardAdmin;
