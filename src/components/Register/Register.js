@@ -5,6 +5,7 @@ import { auth, db } from "../../firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 function Register() {
   let navigate = useNavigate();
@@ -83,6 +84,13 @@ function Register() {
                 <div className="login-form-validate-text">Valider</div>
               </a>
             </div>
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/")}
+              className="login-first-connection-button"
+            >
+              Se connecter
+            </Button>
           </div>
         </div>
       </div>
