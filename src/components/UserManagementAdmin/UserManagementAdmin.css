@@ -25,10 +25,13 @@
 }
 .user-management-admin-item-mail{
     flex: 1;
+    font-weight: 700;
+
 }
 .user-management-admin-item-delete{
     flex: 1;
     align-self: flex-end;
     max-width: 40px!important;
     height: 40px!important;
+    cursor: pointer;
 }
