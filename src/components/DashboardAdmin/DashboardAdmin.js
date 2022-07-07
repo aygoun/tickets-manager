@@ -1,25 +1,21 @@
 import "./DashboardAdmin.css";
 import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
-import { auth, db } from "../../firebase";
-import plus from "../../assets/plus.png";
-import TicketDetail from "../items/TicketDetail";
+import { db } from "../../firebase";
+import TicketDetailAdmin from "../items/TicketDetailAdmin";
 import { useNavigate } from "react-router-dom";
 import {
   collection,
   query,
-  where,
-  getDocs,
   orderBy,
   onSnapshot,
+  doc,
+  getDoc
 } from "firebase/firestore";
 import users from "../../assets/users.png";
 
-
 function DashboardAdmin() {
   let navigate = useNavigate();
-
-  //CHECK IF USER ADMIN
 
   const userEmail = sessionStorage.getItem("userEmail");
   const [allUserTickets, setAllUserTickets] = useState([]);
@@ -28,10 +24,27 @@ function DashboardAdmin() {
   const [open, setOpen] = useState([]);
   const [closed, setClosed] = useState([]);
   const [affected, setAffected] = useState([]);
-  const [suspended, setSuspended] = useState([]);
+  const [solved, setSolved] = useState([]);
+
+  const getUserPermissions = async () => {
+    const docRef = doc(db, "users", userEmail);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      if (docSnap.data().isAdmin == true) {
+        console.log("Checked");
+      }
+      else {
+        navigate("/dashboard");
+      }
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
+  };
 
   const fetchTickets = async () => {
-    const q = query(collection(db, "tickets"), where("from", "==", userEmail), orderBy("date", "desc"));
+    const q = query(collection(db, "tickets"), orderBy("date", "desc"));
       const querySnapshot = onSnapshot (q, (querySnapshot) => {
         const tickets = querySnapshot.docs.map((doc) => {
           return {
@@ -48,7 +61,7 @@ function DashboardAdmin() {
           setOpen([]);
           setClosed([]);
           setAffected([]);
-          setSuspended([]);
+          setSolved([]);
           tickets.forEach(element => {
             switch (element.status) {
               case "Ouvert":
@@ -60,8 +73,8 @@ function DashboardAdmin() {
               case "Affecté":
                 setAffected(affected => [...affected, element]);
                 break;
-              case "Suspendu":
-                setSuspended(suspended => [...suspended, element]);
+              case "Résolu":
+                setSolved(solved => [...solved, element]);
                 break;
               default:
                 break;
@@ -76,7 +89,10 @@ function DashboardAdmin() {
     if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
       fetchTickets();
     }
-  }, [userTickets]);
+    if (userEmail !== "ticketmanager@festival-aix.com") {
+      getUserPermissions();
+    }
+  }, [allUserTickets]);
 
   return (
     <div>
@@ -103,6 +119,14 @@ function DashboardAdmin() {
           <div className="dashboard-content-title">Tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
+            <span
+                onClick={() => setUserTickets(allUserTickets)}
+                className="dashboard-content-body-menu"
+              >
+                <div className="dashboard-content-filter-choices">
+                  TOUS ({allUserTickets.length})
+                </div>
+              </span>
               <span
                 onClick={() => setUserTickets(open)}
                 className="dashboard-content-body-menu"
@@ -120,11 +144,11 @@ function DashboardAdmin() {
                 </div>
               </span>
               <span
-                onClick={() => setUserTickets(suspended)}
+                onClick={() => setUserTickets(solved)}
                 className="dashboard-content-body-menu"
               >
                 <div className="dashboard-content-filter-choices">
-                  SUSPENDU ({suspended.length})
+                  RÉSOLU ({solved.length})
                 </div>
               </span>
               <span
@@ -142,7 +166,7 @@ function DashboardAdmin() {
             <div className=" dashboard-content-body-content-container">
               {userTickets &&
                 userTickets.map((ticket, key) => {
-                  return <TicketDetail ticket={ticket} key={key} isAdmin={true} />;
+                  return <TicketDetailAdmin ticket={ticket} key={key} isAdmin={true} />;
                 })}
               {<h3 align="center">{noTickets}</h3>}
             </div>
