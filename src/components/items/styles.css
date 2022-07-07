@@ -64,9 +64,6 @@
     font-weight: 700;
     margin-right: 1rem;
 }
-.ticket-preview-subject-container{
-    flex-grow: 4!important;
-}
 .ticket-preview-info-status-container{
     margin-right: 1rem;
     background-color: black;
@@ -91,4 +88,14 @@
 }
 .span-button{
     cursor: pointer;
+}
+.ticket-preview-suject-date-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 4 !important;
+}
+.ticket-preview-date-container{
+    font-style: italic;
+    font-size: 0.8rem;
 }

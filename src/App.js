@@ -19,7 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/view-ticket:id" element={<ViewTicket />} />
+          <Route path="/view-ticket:id:admin" element={<ViewTicket />} />
           <Route path="/register" element={<Register />} />
           <Route path="/new-ticket" element={<NewTicket />} />
           {/*ADMIN ROUTES*/}

@@ -19,6 +19,7 @@ function Dashboard() {
   let navigate = useNavigate();
 
   const userEmail = sessionStorage.getItem("userEmail");
+  const [allUserTickets, setAllUserTickets] = useState([]);
   const [userTickets, setUserTickets] = useState([]);
   const [noTickets, setNoTickets] = useState("");
   const [openNb, setOpenNb] = useState([]);
@@ -43,6 +44,7 @@ function Dashboard() {
           setNoTickets("Aucun ticket");
         }else{
           setNoTickets("");
+          setAllUserTickets(tickets);
           setUserTickets(tickets);
           setOpenNb([]);
           setClosedNb([]);
@@ -50,17 +52,17 @@ function Dashboard() {
           setSuspendedNb([]);
           tickets.forEach(element => {
             switch (element.status) {
-              case "open":
-                setOpenNb(openNb => [...openNb, element]);
+              case "Ouvert":
+                setOpenNb((open) => [...open, element]);
                 break;
-              case "closed":
-                setClosedNb(closedNb => [...closedNb, element]);
+              case "Fermé":
+                setClosedNb((closed) => [...closed, element]);
                 break;
-              case "affected":
-                setAffectedNb(affectedNb => [...affectedNb, element]);
+              case "Affecté":
+                setAffectedNb((affected) => [...affected, element]);
                 break;
-              case "suspended":
-                setSuspendedNb(suspendedNb => [...suspendedNb, element]);
+              case "Suspendu":
+                setSuspendedNb((suspended) => [...suspended, element]);
                 break;
               default:
                 break;
@@ -72,7 +74,7 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    if (Object.entries(userTickets).length === 0 && noTickets === "") {
+    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
       fetchTickets();
     }
   }, [userTickets]);

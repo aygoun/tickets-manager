@@ -13,16 +13,24 @@ import {
 import { db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-function ViewTicket() {
+function ViewTicket(props) {
   let navigate = useNavigate();
   let email = sessionStorage.getItem("userEmail");
   let idTmp = useParams().id;
+  let isAdminTmp = useParams().admin;
+  
+  let isAdmin = false;
+  if (isAdminTmp == "Y"){
+    isAdmin = true;
+  }
   let id = idTmp.substring(1);
+  id = id.slice(0, -1);
   const [ticket, setTicket] = useState({});
   const [date, setDate] = useState("");
 
   const getTicket = async () => {
     console.log("ID: " +id);
+    console.log("Admin:"+isAdminTmp);
     const docRef = doc(db, "tickets", id);
     const docSnap = await getDoc(docRef);
 
@@ -113,7 +121,7 @@ function ViewTicket() {
               <div className="newticket-cancel-button-flex-none">
                 <Button
                   variant="outlined"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => {isAdmin ? navigate("/admin") : navigate("/dashboard")}}
                 >
                   Retour
                 </Button>
