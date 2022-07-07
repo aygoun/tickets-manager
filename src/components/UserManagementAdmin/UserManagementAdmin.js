@@ -34,7 +34,9 @@ function UserManagementAdmin() {
     let usersTmp = [];
     querySnapshot.forEach((doc) => {
       console.log(doc.id, " => ", doc.data());
-      usersTmp.push(doc.data());
+      if (doc.data().email !== "ticketmanager@festival-aix.com") {
+        usersTmp.push(doc.data());
+      }
     });
     setUsers(usersTmp);
   };

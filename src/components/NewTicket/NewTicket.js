@@ -37,6 +37,7 @@ function NewTicket() {
         status: "Ouvert",
         from: email,
         ticketID: id,
+        affectedTo: [],
       };
       await setDoc(doc(db, "tickets", id), data);
 

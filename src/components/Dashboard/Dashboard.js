@@ -25,7 +25,7 @@ function Dashboard() {
   const [openNb, setOpenNb] = useState([]);
   const [closedNb, setClosedNb] = useState([]);
   const [affectedNb, setAffectedNb] = useState([]);
-  const [suspendedNb, setSuspendedNb] = useState([]);
+  const [solvedNb, setSolvedNb] = useState([]);
 
   const handleNewTicket = () => {
     navigate("/new-ticket");
@@ -49,7 +49,7 @@ function Dashboard() {
           setOpenNb([]);
           setClosedNb([]);
           setAffectedNb([]);
-          setSuspendedNb([]);
+          setSolvedNb([]);
           tickets.forEach(element => {
             switch (element.status) {
               case "Ouvert":
@@ -61,8 +61,8 @@ function Dashboard() {
               case "Affecté":
                 setAffectedNb((affected) => [...affected, element]);
                 break;
-              case "Suspendu":
-                setSuspendedNb((suspended) => [...suspended, element]);
+              case "Résolu":
+                setSolvedNb((solved) => [...solved, element]);
                 break;
               default:
                 break;
@@ -98,6 +98,14 @@ function Dashboard() {
           <div className="dashboard-content-title">Mes tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
+            <span
+                onClick={() => setUserTickets(allUserTickets)}
+                className="dashboard-content-body-menu"
+              >
+                <div className="dashboard-content-filter-choices">
+                  TOUS ({allUserTickets.length})
+                </div>
+              </span>
               <span onClick={() => setUserTickets(openNb)} className="dashboard-content-body-menu" style={{borderTopLeft: "100px"}}>
                 <div className="dashboard-content-filter-choices">OUVERT ({openNb.length})</div>
               </span>
@@ -106,8 +114,8 @@ function Dashboard() {
                   AFFECTÉ ({affectedNb.length})
                 </div>
               </span>
-              <span onClick={() => setUserTickets(suspendedNb)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices">SUSPENDU ({suspendedNb.length})</div>
+              <span onClick={() => setUserTickets(solvedNb)} className="dashboard-content-body-menu">
+                <div className="dashboard-content-filter-choices">RÉSOLU ({solvedNb.length})</div>
               </span>
               <span onClick={() => setUserTickets(closedNb)} className="dashboard-content-body-menu">
                 <div className="dashboard-content-filter-choices" style={{borderBottom: '0px solid'}}>FERMÉ ({closedNb.length})</div>
