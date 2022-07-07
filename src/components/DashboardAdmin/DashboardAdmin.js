@@ -19,13 +19,16 @@ import users from "../../assets/users.png";
 function DashboardAdmin() {
   let navigate = useNavigate();
 
+  //CHECK IF USER ADMIN
+
   const userEmail = sessionStorage.getItem("userEmail");
+  const [allUserTickets, setAllUserTickets] = useState([]);
   const [userTickets, setUserTickets] = useState([]);
   const [noTickets, setNoTickets] = useState("");
-  const [openNb, setOpenNb] = useState([]);
-  const [closedNb, setClosedNb] = useState([]);
-  const [affectedNb, setAffectedNb] = useState([]);
-  const [suspendedNb, setSuspendedNb] = useState([]);
+  const [open, setOpen] = useState([]);
+  const [closed, setClosed] = useState([]);
+  const [affected, setAffected] = useState([]);
+  const [suspended, setSuspended] = useState([]);
 
   const fetchTickets = async () => {
     const q = query(collection(db, "tickets"), where("from", "==", userEmail), orderBy("date", "desc"));
@@ -40,24 +43,25 @@ function DashboardAdmin() {
           setNoTickets("Aucun ticket");
         }else{
           setNoTickets("");
+          setAllUserTickets(tickets);
           setUserTickets(tickets);
-          setOpenNb([]);
-          setClosedNb([]);
-          setAffectedNb([]);
-          setSuspendedNb([]);
+          setOpen([]);
+          setClosed([]);
+          setAffected([]);
+          setSuspended([]);
           tickets.forEach(element => {
             switch (element.status) {
-              case "open":
-                setOpenNb(openNb => [...openNb, element]);
+              case "Ouvert":
+                setOpen(open => [...open, element]);
                 break;
-              case "closed":
-                setClosedNb(closedNb => [...closedNb, element]);
+              case "Fermé":
+                setClosed(closed => [...closed, element]);
                 break;
-              case "affected":
-                setAffectedNb(affectedNb => [...affectedNb, element]);
+              case "Affecté":
+                setAffected(affected => [...affected, element]);
                 break;
-              case "suspended":
-                setSuspendedNb(suspendedNb => [...suspendedNb, element]);
+              case "Suspendu":
+                setSuspended(suspended => [...suspended, element]);
                 break;
               default:
                 break;
@@ -69,7 +73,7 @@ function DashboardAdmin() {
   };
 
   useEffect(() => {
-    if (Object.entries(userTickets).length === 0 && noTickets === "") {
+    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
       fetchTickets();
     }
   }, [userTickets]);
@@ -80,9 +84,15 @@ function DashboardAdmin() {
       <div className="dashboard-container">
         <div className="dashboard-header-content">
           <div className="dashboard-content-header-title">
-            👋 Bonjour {userEmail} !
+            <span style={{color: 'red'}}>MODE ADMIN</span>
+            <br />
+            Connecté en {userEmail} !
           </div>
-          <a href="" onClick={() => navigate("/users-management")} style={{marginRight: 25}}>
+          <a
+            href=""
+            onClick={() => navigate("/users-management")}
+            style={{ marginRight: 25 }}
+          >
             <img
               src={users}
               className="dashboard-content-header-newTicketButton"
@@ -93,25 +103,46 @@ function DashboardAdmin() {
           <div className="dashboard-content-title">Tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
-              <span onClick={() => setUserTickets(openNb)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices">OUVERT ({openNb.length})</div>
-              </span>
-              <span onClick={() => setUserTickets(affectedNb)} className="dashboard-content-body-menu">
+              <span
+                onClick={() => setUserTickets(open)}
+                className="dashboard-content-body-menu"
+              >
                 <div className="dashboard-content-filter-choices">
-                  AFFECTÉ ({affectedNb.length})
+                  OUVERT ({open.length})
                 </div>
               </span>
-              <span onClick={() => setUserTickets(suspendedNb)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices">SUSPENDU ({suspendedNb.length})</div>
+              <span
+                onClick={() => setUserTickets(affected)}
+                className="dashboard-content-body-menu"
+              >
+                <div className="dashboard-content-filter-choices">
+                  AFFECTÉ ({affected.length})
+                </div>
               </span>
-              <span onClick={() => setUserTickets(closedNb)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices" style={{borderBottom: '0px solid'}}>FERMÉ ({closedNb.length})</div>
+              <span
+                onClick={() => setUserTickets(suspended)}
+                className="dashboard-content-body-menu"
+              >
+                <div className="dashboard-content-filter-choices">
+                  SUSPENDU ({suspended.length})
+                </div>
+              </span>
+              <span
+                onClick={() => setUserTickets(closed)}
+                className="dashboard-content-body-menu"
+              >
+                <div
+                  className="dashboard-content-filter-choices"
+                  style={{ borderBottom: "0px solid" }}
+                >
+                  FERMÉ ({closed.length})
+                </div>
               </span>
             </div>
             <div className=" dashboard-content-body-content-container">
               {userTickets &&
                 userTickets.map((ticket, key) => {
-                  return <TicketDetail ticket={ticket} key={key} />;
+                  return <TicketDetail ticket={ticket} key={key} isAdmin={true} />;
                 })}
               {<h3 align="center">{noTickets}</h3>}
             </div>
