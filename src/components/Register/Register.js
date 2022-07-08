@@ -6,6 +6,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
+import Footer from "../items/Footer";
 
 function Register() {
   let navigate = useNavigate();
@@ -94,6 +95,7 @@ function Register() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

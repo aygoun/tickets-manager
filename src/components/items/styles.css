@@ -99,3 +99,26 @@
     font-style: italic;
     font-size: 0.8rem;
 }
+.footer{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.footer-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background-color: #ececec;
+    width: 100%;
+}
+.footer-content-text-title{
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+.footer-content-text-copy{
+    flex: 1;
+    font-size: 0.8rem;
+}

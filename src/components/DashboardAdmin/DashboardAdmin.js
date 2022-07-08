@@ -7,12 +7,18 @@ import { useNavigate } from "react-router-dom";
 import {
   collection,
   query,
+  where,
+  getDocs,
   orderBy,
   onSnapshot,
+  startAfter,
+  limit,
   doc,
   getDoc
 } from "firebase/firestore";
 import users from "../../assets/users.png";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 
 function DashboardAdmin() {
   let navigate = useNavigate();
@@ -25,6 +31,8 @@ function DashboardAdmin() {
   const [closed, setClosed] = useState([]);
   const [affected, setAffected] = useState([]);
   const [solved, setSolved] = useState([]);
+  const [lastDoc, setLastDoc] = useState(null);
+  const [search, setSearch] = useState("");
 
   const getUserPermissions = async () => {
     const docRef = doc(db, "users", userEmail);
@@ -43,47 +51,116 @@ function DashboardAdmin() {
     }
   };
 
-  const fetchTickets = async () => {
-    const q = query(collection(db, "tickets"), orderBy("date", "desc"));
-      const querySnapshot = onSnapshot (q, (querySnapshot) => {
-        const tickets = querySnapshot.docs.map((doc) => {
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
+  const handleChange = () => {
+    const next = query(collection(db, "tickets"), limit(50), orderBy("date", "desc"), startAfter(lastDoc));
+    const querySnapshot = onSnapshot(next, (querySnapshot) => {
+      const tickets = querySnapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      if (tickets.length === 0) {
+        setNoTickets("Aucun ticket");
+      } else {
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        setLastDoc(lastVisible);
+        setNoTickets("");
+        setAllUserTickets(tickets);
+        setUserTickets(tickets);
+        setOpen([]);
+        setClosed([]);
+        setAffected([]);
+        setSolved([]);
+        tickets.forEach(element => {
+          switch (element.status) {
+            case "Ouvert":
+              setOpen(open => [...open, element]);
+              break;
+            case "Fermé":
+              setClosed(closed => [...closed, element]);
+              break;
+            case "Affecté":
+              setAffected(affected => [...affected, element]);
+              break;
+            case "Résolu":
+              setSolved(solved => [...solved, element]);
+              break;
+            default:
+              break;
+          }
         });
-        if (tickets.length === 0) {
-          setNoTickets("Aucun ticket");
-        }else{
-          setNoTickets("");
-          setAllUserTickets(tickets);
-          setUserTickets(tickets);
-          setOpen([]);
-          setClosed([]);
-          setAffected([]);
-          setSolved([]);
-          tickets.forEach(element => {
-            switch (element.status) {
-              case "Ouvert":
-                setOpen(open => [...open, element]);
-                break;
-              case "Fermé":
-                setClosed(closed => [...closed, element]);
-                break;
-              case "Affecté":
-                setAffected(affected => [...affected, element]);
-                break;
-              case "Résolu":
-                setSolved(solved => [...solved, element]);
-                break;
-              default:
-                break;
-            }
-          });
-        }
       }
-      );
+    }
+    );
   };
+
+  const fetchTickets = async () => {
+    const q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50));
+    const querySnapshot = onSnapshot(q, (querySnapshot) => {
+      const tickets = querySnapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      if (tickets.length === 0) {
+        setNoTickets("Aucun ticket");
+      } else {
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        setLastDoc(lastVisible);
+
+        setNoTickets("");
+        setAllUserTickets(tickets);
+        setUserTickets(tickets);
+        setOpen([]);
+        setClosed([]);
+        setAffected([]);
+        setSolved([]);
+        tickets.forEach(element => {
+          switch (element.status) {
+            case "Ouvert":
+              setOpen(open => [...open, element]);
+              break;
+            case "Fermé":
+              setClosed(closed => [...closed, element]);
+              break;
+            case "Affecté":
+              setAffected(affected => [...affected, element]);
+              break;
+            case "Résolu":
+              setSolved(solved => [...solved, element]);
+              break;
+            default:
+              break;
+          }
+        });
+      }
+    }
+    );
+  };
+
+  const handleSearchChange = async (value) => {
+    setSearch(value);
+    if (value.length > 3) {
+      const q = query(collection(db, "tickets"), where("object", "==", value), orderBy("date", "desc"));
+      const qUsername = query(collection(db, "tickets"), where("from", "==", value), orderBy("date", "desc"));
+
+      const querySnapshot = await getDocs(q);
+      const querySnapshotUsername = await getDocs(qUsername);
+      let tickets = [];
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        tickets.push(doc.data());
+      });
+      querySnapshotUsername.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        //console.log("Doc: " + doc.data());
+        tickets.push(doc.data());
+      });
+      setUserTickets(tickets);
+    }
+  }
 
   useEffect(() => {
     if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
@@ -100,7 +177,7 @@ function DashboardAdmin() {
       <div className="dashboard-container">
         <div className="dashboard-header-content">
           <div className="dashboard-content-header-title">
-            <span style={{color: 'red'}}>MODE ADMIN</span>
+            <span style={{ color: 'red' }}>MODE ADMIN</span>
             <br />
             Connecté en {userEmail} !
           </div>
@@ -116,10 +193,15 @@ function DashboardAdmin() {
           </a>
         </div>
         <div className="dashboard-content-body">
-          <div className="dashboard-content-title">Tickets :</div>
+          <div className="dashboard-content-serchbar-container">
+            <div className="dashboard-content-title">Tickets :</div>
+            <div className="dashboard-content-title">
+            <TextField id="outlined-search" label="Résumé ou mail" type="search" value={search} onChange={(e) => handleSearchChange(e.target.value)}/>
+            </div>
+          </div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
-            <span
+              <span
                 onClick={() => setUserTickets(allUserTickets)}
                 className="dashboard-content-body-menu"
               >
@@ -163,12 +245,15 @@ function DashboardAdmin() {
                 </div>
               </span>
             </div>
-            <div className=" dashboard-content-body-content-container">
-              {userTickets &&
-                userTickets.map((ticket, key) => {
-                  return <TicketDetailAdmin ticket={ticket} key={key} isAdmin={true} />;
-                })}
-              {<h3 align="center">{noTickets}</h3>}
+            <div className="dashboard-content-body-content-container">
+              <div className="flex1 dashboard-content-body-content-subcontainer">
+                {userTickets &&
+                  userTickets.map((ticket, key) => {
+                    return <TicketDetailAdmin ticket={ticket} key={key} isAdmin={true} />;
+                  })}
+                {<h3 align="center">{noTickets}</h3>}
+              </div>
+              <div className="flex1"><Button onClick={handleChange} variant="outlined">Charger</Button></div>
             </div>
           </div>
         </div>

@@ -111,6 +111,7 @@ function TicketDetailAdmin(props) {
             {ticket.object}
           </div>
           <div className="ticket-preview-date-container flex1">{date}</div>
+          <div className="ticket-preview-date-container flex1">{ticket.from}</div>
         </div>
 
         <div className="ticket-preview-info-container flex1">
