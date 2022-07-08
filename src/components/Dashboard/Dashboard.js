@@ -12,8 +12,10 @@ import {
   getDocs,
   orderBy,
   onSnapshot,
+  startAfter,
+  limit,
 } from "firebase/firestore";
-
+import Button from "@mui/material/Button";
 
 function Dashboard() {
   let navigate = useNavigate();
@@ -22,55 +24,100 @@ function Dashboard() {
   const [allUserTickets, setAllUserTickets] = useState([]);
   const [userTickets, setUserTickets] = useState([]);
   const [noTickets, setNoTickets] = useState("");
-  const [openNb, setOpenNb] = useState([]);
-  const [closedNb, setClosedNb] = useState([]);
-  const [affectedNb, setAffectedNb] = useState([]);
-  const [solvedNb, setSolvedNb] = useState([]);
+  const [open, setOpen] = useState([]);
+  const [closed, setClosed] = useState([]);
+  const [affected, setAffected] = useState([]);
+  const [solved, setSolved] = useState([]);
+  const [lastDoc, setLastDoc] = useState(null);
 
   const handleNewTicket = () => {
     navigate("/new-ticket");
   };
+  
+  const handleChange = () => {
+    const next = query(collection(db, "tickets"), limit(25), orderBy("date", "desc"), startAfter(lastDoc));
+    const querySnapshot = onSnapshot (next, (querySnapshot) => {
+      const tickets = querySnapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      if (tickets.length === 0) {
+        setNoTickets("Aucun ticket");
+      }else{
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
+        setLastDoc(lastVisible);
+        setNoTickets("");
+        setAllUserTickets(tickets);
+        setUserTickets(tickets);
+        setOpen([]);
+        setClosed([]);
+        setAffected([]);
+        setSolved([]);
+        tickets.forEach(element => {
+          switch (element.status) {
+            case "Ouvert":
+              setOpen(open => [...open, element]);
+              break;
+            case "Fermé":
+              setClosed(closed => [...closed, element]);
+              break;
+            case "Affecté":
+              setAffected(affected => [...affected, element]);
+              break;
+            case "Résolu":
+              setSolved(solved => [...solved, element]);
+              break;
+            default:
+              break;
+          }
+        });
+      }
+    }
+    );
+  };
 
   const fetchTickets = async () => {
-    const q = query(collection(db, "tickets"), where("from", "==", userEmail), orderBy("date", "desc"));
-      const querySnapshot = onSnapshot (q, (querySnapshot) => {
-        const tickets = querySnapshot.docs.map((doc) => {
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
+    const q = query(collection(db, "tickets"), limit(25), where("from", "==", userEmail), orderBy("date", "desc")) ;
+    const querySnapshot = onSnapshot(q, (querySnapshot) => {
+      const tickets = querySnapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      if (tickets.length === 0) {
+        setNoTickets("Aucun ticket");
+      } else {
+        setNoTickets("");
+        setAllUserTickets(tickets);
+        setUserTickets(tickets);
+        setOpen([]);
+        setClosed([]);
+        setAffected([]);
+        setSolved([]);
+        tickets.forEach(element => {
+          switch (element.status) {
+            case "Ouvert":
+              setOpen((open) => [...open, element]);
+              break;
+            case "Fermé":
+              setClosed((closed) => [...closed, element]);
+              break;
+            case "Affecté":
+              setAffected((affected) => [...affected, element]);
+              break;
+            case "Résolu":
+              setSolved((solved) => [...solved, element]);
+              break;
+            default:
+              break;
+          }
         });
-        if (tickets.length === 0) {
-          setNoTickets("Aucun ticket");
-        }else{
-          setNoTickets("");
-          setAllUserTickets(tickets);
-          setUserTickets(tickets);
-          setOpenNb([]);
-          setClosedNb([]);
-          setAffectedNb([]);
-          setSolvedNb([]);
-          tickets.forEach(element => {
-            switch (element.status) {
-              case "Ouvert":
-                setOpenNb((open) => [...open, element]);
-                break;
-              case "Fermé":
-                setClosedNb((closed) => [...closed, element]);
-                break;
-              case "Affecté":
-                setAffectedNb((affected) => [...affected, element]);
-                break;
-              case "Résolu":
-                setSolvedNb((solved) => [...solved, element]);
-                break;
-              default:
-                break;
-            }
-          });
-        }
       }
-      );
+    }
+    );
   };
 
   useEffect(() => {
@@ -98,7 +145,7 @@ function Dashboard() {
           <div className="dashboard-content-title">Mes tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
-            <span
+              <span
                 onClick={() => setUserTickets(allUserTickets)}
                 className="dashboard-content-body-menu"
               >
@@ -106,27 +153,30 @@ function Dashboard() {
                   TOUS ({allUserTickets.length})
                 </div>
               </span>
-              <span onClick={() => setUserTickets(openNb)} className="dashboard-content-body-menu" style={{borderTopLeft: "100px"}}>
-                <div className="dashboard-content-filter-choices">OUVERT ({openNb.length})</div>
+              <span onClick={() => setUserTickets(open)} className="dashboard-content-body-menu" style={{ borderTopLeft: "100px" }}>
+                <div className="dashboard-content-filter-choices">OUVERT ({open.length})</div>
               </span>
-              <span onClick={() => setUserTickets(affectedNb)} className="dashboard-content-body-menu">
+              <span onClick={() => setUserTickets(affected)} className="dashboard-content-body-menu">
                 <div className="dashboard-content-filter-choices">
-                  AFFECTÉ ({affectedNb.length})
+                  AFFECTÉ ({affected.length})
                 </div>
               </span>
-              <span onClick={() => setUserTickets(solvedNb)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices">RÉSOLU ({solvedNb.length})</div>
+              <span onClick={() => setUserTickets(solved)} className="dashboard-content-body-menu">
+                <div className="dashboard-content-filter-choices">RÉSOLU ({solved.length})</div>
               </span>
-              <span onClick={() => setUserTickets(closedNb)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices" style={{borderBottom: '0px solid'}}>FERMÉ ({closedNb.length})</div>
+              <span onClick={() => setUserTickets(closed)} className="dashboard-content-body-menu">
+                <div className="dashboard-content-filter-choices" style={{ borderBottom: '0px solid' }}>FERMÉ ({closed.length})</div>
               </span>
             </div>
             <div className=" dashboard-content-body-content-container">
-              {userTickets &&
-                userTickets.map((ticket, key) => {
-                  return <TicketDetail ticket={ticket} key={key} />;
-                })}
-              {<h3 align="center">{noTickets}</h3>}
+              <div className="flex1 dashboard-content-body-content-subcontainer">
+                {userTickets &&
+                  userTickets.map((ticket, key) => {
+                    return <TicketDetail ticket={ticket} key={key} />;
+                  })}
+                {<h3 align="center">{noTickets}</h3>}
+              </div>
+              <div className="flex1"><Button onClick={handleChange} variant="outlined">Charger</Button></div>
             </div>
           </div>
         </div>
