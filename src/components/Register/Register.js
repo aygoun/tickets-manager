@@ -42,21 +42,22 @@ function Register() {
       alert("Veuillez remplir tous les champs");
     } else {
       //send api request
-      const response = await Axios('http://localhost:8080/mail:'+email);
+      const response = await Axios('http://localhost:8080/mail:' + email);
       console.log(response.data);
       if (response.data == "KO") {
-        alert("Une ereur est survenue, veuillez réessayer");
+        alert("Une erreur est survenue, veuillez réessayer");
       }
-      else{
+      else {
         setVerifiedPassword(response.data);
         handleClickOpen();
       }
     }
   };
 
-  const handleAccountCreation = (pass) => {
-    if (verifiedPassword === pass) {
-    const auth = getAuth();
+  const handleAccountCreation = () => {
+    console.log("Verified password : " + verifiedPassword);
+    if (verifiedPassword === tmpPassword) {
+      const auth = getAuth();
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in user
@@ -77,38 +78,15 @@ function Register() {
           const errorMessage = error.message;
           alert("Erreur: " + errorMessage);
         });
-      }
-      else{
-        alert("Le mot de passe ne correspond pas");
-      }
+    }
+    else {
+      alert("Le mot de passe ne correspond pas");
+    }
   };
 
   return (
     <div>
       <Header isLogout={false} />
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Entrer le code à 4 chiffre envoyé sur : {email}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Vous avez reçu un mail pour vérifier votre compte. Veuillez entrer le mot de passe que vous avez reçu dans le champ ci-dessous.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="0000"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={tmpPassword}
-            onChange={(e) => setTmpPassword(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Annuler</Button>
-          <Button onClick={(e) => handleAccountCreation(e.target.value)}>Valider</Button>
-        </DialogActions>
-      </Dialog>
       <div className="login-container">
         <div className="login-form">
           <div className="login-form-header">
@@ -140,6 +118,29 @@ function Register() {
                 onClick={handleSubmit}
               >
                 <div className="login-form-validate-text">Valider</div>
+                <Dialog open={open} onClose={handleClose}>
+                  <DialogTitle>Entrer le code à 4 chiffre envoyé sur : {email}</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Vous avez reçu un mail pour vérifier votre compte. Veuillez entrer le mot de passe que vous avez reçu dans le champ ci-dessous.
+                    </DialogContentText>
+                    <TextField
+                      autoFocus
+                      margin="dense"
+                      id="name"
+                      label="0000"
+                      type="text"
+                      fullWidth
+                      variant="standard"
+                      value={tmpPassword}
+                      onChange={(e) => setTmpPassword(e.target.value)}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>Annuler</Button>
+                    <Button onClick={() => handleAccountCreation()}>Valider</Button>
+                  </DialogActions>
+                </Dialog>
               </a>
             </div>
             <Button
