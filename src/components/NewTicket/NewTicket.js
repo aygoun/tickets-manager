@@ -11,8 +11,9 @@ import {
   Button,
 } from "@mui/material";
 import { db } from "../../firebase";
-import { doc, addDoc, collection, setDoc, updateDoc, increment } from "firebase/firestore"; 
+import { doc, addDoc, collection, setDoc, updateDoc, increment } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
+import Axios from "axios";
 
 
 function NewTicket() {
@@ -28,26 +29,33 @@ function NewTicket() {
     console.log("Resume: " + resume);
     console.log("Description: " + description);
     if (tag !== "" && resume !== "" && description !== "") {
-      let id = uuidv4();
-      let data = {
-        tag: tag,
-        object: resume,
-        body: description,
-        date: new Date(),
-        status: "Ouvert",
-        from: email,
-        ticketID: id,
-        affectedTo: [],
-      };
-      await setDoc(doc(db, "tickets", id), data);
+      //SEND API REQUEST:
+      const ticketData = { tag: tag, object: resume, body: description };
+      let response = await Axios.post("http://localhost:8080/ticket", ticketData);
+      if (response.data === "OK") {
+        let id = uuidv4();
+        let data = {
+          tag: tag,
+          object: resume,
+          body: description,
+          date: new Date(),
+          status: "Ouvert",
+          from: email,
+          ticketID: id,
+          affectedTo: [],
+        };
+        await setDoc(doc(db, "tickets", id), data);
 
-      //Incremente the number of tickets in the user profile
-      const userRef = doc(db, "users", email);
-      await updateDoc(userRef, {
+        //Incremente the number of tickets in the user profile
+        const userRef = doc(db, "users", email);
+        await updateDoc(userRef, {
           nbTickets: increment(1)
-      });
-
-      navigate("/dashboard");
+        });
+        navigate("/dashboard");
+      }
+      else {
+        alert("Une erreur est survenue, veuillez réessayer");
+      }
     } else {
       alert("Veuillez remplir tous les champs");
     }

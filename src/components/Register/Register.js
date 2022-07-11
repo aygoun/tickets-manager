@@ -7,14 +7,31 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Footer from "../items/Footer";
+import Axios from "axios";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 function Register() {
   let navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [open, setOpen] = useState(false);
+  const [verifiedPassword, setVerifiedPassword] = useState("");
+  const [tmpPassword, setTmpPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
     const emailSplited = email.split("@");
     if (
       email.length < 17 ||
@@ -24,34 +41,74 @@ function Register() {
     ) {
       alert("Veuillez remplir tous les champs");
     } else {
-        const auth = getAuth();
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed in user
-            const user = userCredential.user;
-            sessionStorage.setItem("userUID", user.uid);
-            sessionStorage.setItem("userEmail", email);
-            // Create user profile
-            const userRef = doc(db, "users", email);
-            setDoc(userRef, {
-              nbTickets: 0,
-              email: email,
-              uid: user.uid,
-              accountVerified: false,
-            });
-            navigate("/dashboard");
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            alert("Erreur: " + errorMessage);
-          });
+      //send api request
+      const response = await Axios('http://localhost:8080/mail:'+email);
+      console.log(response.data);
+      if (response.data == "KO") {
+        alert("Une ereur est survenue, veuillez réessayer");
+      }
+      else{
+        setVerifiedPassword(response.data);
+        handleClickOpen();
+      }
     }
+  };
+
+  const handleAccountCreation = (pass) => {
+    if (verifiedPassword === pass) {
+    const auth = getAuth();
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in user
+          const user = userCredential.user;
+          sessionStorage.setItem("userUID", user.uid);
+          sessionStorage.setItem("userEmail", email);
+          // Create user profile
+          const userRef = doc(db, "users", email);
+          setDoc(userRef, {
+            nbTickets: 0,
+            email: email,
+            uid: user.uid,
+          });
+          navigate("/dashboard");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          alert("Erreur: " + errorMessage);
+        });
+      }
+      else{
+        alert("Le mot de passe ne correspond pas");
+      }
   };
 
   return (
     <div>
       <Header isLogout={false} />
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Entrer le code à 4 chiffre envoyé sur : {email}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Vous avez reçu un mail pour vérifier votre compte. Veuillez entrer le mot de passe que vous avez reçu dans le champ ci-dessous.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="0000"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={tmpPassword}
+            onChange={(e) => setTmpPassword(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Annuler</Button>
+          <Button onClick={(e) => handleAccountCreation(e.target.value)}>Valider</Button>
+        </DialogActions>
+      </Dialog>
       <div className="login-container">
         <div className="login-form">
           <div className="login-form-header">
