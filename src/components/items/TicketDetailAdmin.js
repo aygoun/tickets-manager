@@ -75,12 +75,32 @@ function TicketDetailAdmin(props) {
   const handleSolve = () => {
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     updateDoc(docRef, { status: "Résolu" });
+    fetch('http://localhost:8080/update', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: ticket.status, 
+        })
+      });
   };
   
   const handleDelete = () => {
     console.log("HELLO: " + ticket.ticketID);
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     updateDoc(docRef, { status: "Fermé" });
+    fetch('http://localhost:8080/update', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: ticket.status, 
+        })
+      });
   };
 
   useEffect(() => {
@@ -91,7 +111,7 @@ function TicketDetailAdmin(props) {
     //Update affectedTo field in db tickets
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     if (ticket.status == "Résolu") {
-      updateDoc(docRef, { affectedTo: personName, status: "Résolu" }); 
+      updateDoc(docRef, { affectedTo: personName, status: "Résolu" });
     }
     else if (personName.length === 0) {
       updateDoc(docRef, { affectedTo: [], status: "Ouvert" });
