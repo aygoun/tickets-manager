@@ -82,7 +82,7 @@ function TicketDetailAdmin(props) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: ticket.status, 
+          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Résolu", 
         })
       });
   };
@@ -98,7 +98,7 @@ function TicketDetailAdmin(props) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: ticket.status, 
+          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Fermé", 
         })
       });
   };
