@@ -30,9 +30,16 @@ function NewTicket() {
     console.log("Description: " + description);
     if (tag !== "" && resume !== "" && description !== "") {
       //SEND API REQUEST:
-      const ticketData = { tag: tag, object: resume, body: description };
-      let response = await Axios.post("http://localhost:8080/ticket", ticketData);
-      if (response.data === "OK") {
+      fetch('http://localhost:8080/ticket', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tag: tag, object: resume, body: description, from: email
+        })
+      });
         let id = uuidv4();
         let data = {
           tag: tag,
@@ -52,10 +59,6 @@ function NewTicket() {
           nbTickets: increment(1)
         });
         navigate("/dashboard");
-      }
-      else {
-        alert("Une erreur est survenue, veuillez réessayer");
-      }
     } else {
       alert("Veuillez remplir tous les champs");
     }
