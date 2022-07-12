@@ -51,11 +51,11 @@ function Register() {
         setVerifiedPassword(response.data);
         handleClickOpen();
       }
+      console.log("Sending request");
     }
   };
 
   const handleAccountCreation = () => {
-    console.log("Verified password : " + verifiedPassword);
     if (verifiedPassword === tmpPassword) {
       const auth = getAuth();
       createUserWithEmailAndPassword(auth, email, password)
@@ -118,11 +118,12 @@ function Register() {
                 onClick={handleSubmit}
               >
                 <div className="login-form-validate-text">Valider</div>
-                <Dialog open={open} onClose={handleClose}>
+              </a>
+              <Dialog open={open} onClose={handleClose}>
                   <DialogTitle>Entrer le code à 4 chiffre envoyé sur : {email}</DialogTitle>
                   <DialogContent>
                     <DialogContentText>
-                      Vous avez reçu un mail pour vérifier votre compte. Veuillez entrer le mot de passe que vous avez reçu dans le champ ci-dessous.
+                      Vous avez reçu un mail pour vérifier votre compte. <br/>Le délai d'envoi est de d'environ 1 minutes.
                     </DialogContentText>
                     <TextField
                       autoFocus
@@ -141,7 +142,6 @@ function Register() {
                     <Button onClick={() => handleAccountCreation()}>Valider</Button>
                   </DialogActions>
                 </Dialog>
-              </a>
             </div>
             <Button
               variant="outlined"
