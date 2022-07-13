@@ -10,7 +10,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 function ViewTicket(props) {
@@ -51,7 +51,14 @@ function ViewTicket(props) {
 
   useEffect(() => {
     getTicket();
-  }, []);
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in");
+      } else {
+        navigate("/");
+      }
+    });
+  }, [navigate]);
 
   return (
     <div>

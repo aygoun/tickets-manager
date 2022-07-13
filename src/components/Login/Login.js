@@ -25,6 +25,7 @@ function Login() {
 
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [passwordForgotten, setPasswordForgotten] = useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -68,16 +69,14 @@ function Login() {
 
   const handleForgottenPassword = () => {
     const auth = getAuth();
-    sendPasswordResetEmail(auth, email)
+    sendPasswordResetEmail(auth, passwordForgotten)
       .then(() => {
-        // Password reset email sent!
-        // ..
         console.log("Email sent");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        // ..
+        alert(errorCode);
       });
   };
   return (
@@ -138,11 +137,13 @@ function Login() {
                     type="email"
                     fullWidth
                     variant="standard"
+                    value={passwordForgotten}
+                    onChange={(e) => setPasswordForgotten(e.target.value)}
                   />
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleClose}>Annuler</Button>
-                  <Button onClick={handleClose}>Valider</Button>
+                  <Button onClick={handleForgottenPassword()}>Valider</Button>
                 </DialogActions>
               </Dialog>
             </div>

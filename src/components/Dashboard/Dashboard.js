@@ -124,7 +124,14 @@ function Dashboard() {
     if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
       fetchTickets();
     }
-  }, [userTickets]);
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in");
+      } else {
+        navigate("/");
+      }
+    });
+  }, [userTickets, navigate]);
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import "./NewTicket.css";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import { doc, addDoc, collection, setDoc, updateDoc, increment } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import Axios from "axios";
@@ -63,6 +63,15 @@ function NewTicket() {
       alert("Veuillez remplir tous les champs");
     }
   };
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in");
+      } else {
+        navigate("/");
+      }
+    });
+  }, [navigate]);
 
   return (
     <div>

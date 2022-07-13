@@ -70,7 +70,14 @@ function UserManagementAdmin() {
     if (Object.entries(users).length === 0) {
       getUsers();
     }
-  }, [users]);
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in");
+      } else {
+        navigate("/");
+      }
+    });
+  }, [users, navigate]);
 
   return (
     <div>
