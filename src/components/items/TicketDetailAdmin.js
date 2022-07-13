@@ -75,7 +75,7 @@ function TicketDetailAdmin(props) {
   const handleSolve = () => {
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     updateDoc(docRef, { status: "Résolu" });
-    fetch('http://localhost:8080/update', {
+    fetch('http://192.168.11.245:8080/update', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
