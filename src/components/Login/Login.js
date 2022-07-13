@@ -73,6 +73,7 @@ function Login() {
     sendPasswordResetEmail(auth, passwordForgotten)
       .then(() => {
         console.log("Email sent");
+        alert("Un email pour reinitialiser votre mot de passe vous a été envoyé.")
       })
       .catch((error) => {
         const errorCode = error.code;
