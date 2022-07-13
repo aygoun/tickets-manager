@@ -1,7 +1,7 @@
 import "./DashboardAdmin.css";
 import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import TicketDetailAdmin from "../items/TicketDetailAdmin";
 import { useNavigate } from "react-router-dom";
 import {
@@ -61,7 +61,7 @@ function DashboardAdmin() {
         };
       });
       if (tickets.length === 0) {
-        setNoTickets("Aucun ticket");
+        setNoTickets("Aucun autre ticket");
       } else {
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
         setLastDoc(lastVisible);
@@ -169,6 +169,13 @@ function DashboardAdmin() {
     if (userEmail !== "ticketmanager@festival-aix.com") {
       getUserPermissions();
     }
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in");
+      } else {
+        navigate("/");
+      }
+    });
   }, [allUserTickets]);
 
   return (
