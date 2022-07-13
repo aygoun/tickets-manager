@@ -40,7 +40,8 @@ function Login() {
     setOpen2(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
+    console.log("Button pressed")
     const emailSplited = email.split("@");
     if (
       email.length < 17 ||
@@ -110,7 +111,7 @@ function Login() {
               <a
                 href="#"
                 className="login-form-validate-a"
-                onClick={handleSubmit}
+                onClick={() => handleSubmit()}
               >
                 <div className="login-form-validate-text">Valider</div>
               </a>
@@ -143,7 +144,7 @@ function Login() {
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleClose}>Annuler</Button>
-                  <Button onClick={handleForgottenPassword()}>Valider</Button>
+                  <Button onClick={handleForgottenPassword}>Valider</Button>
                 </DialogActions>
               </Dialog>
             </div>

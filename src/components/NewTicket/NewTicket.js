@@ -30,7 +30,7 @@ function NewTicket() {
     console.log("Description: " + description);
     if (tag !== "" && resume !== "" && description !== "") {
       //SEND API REQUEST:
-      fetch('http://localhost:8080/ticket', {
+      fetch('http://192.168.11.245:8080/ticket', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
