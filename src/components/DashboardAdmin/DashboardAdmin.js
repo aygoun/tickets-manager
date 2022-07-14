@@ -206,7 +206,8 @@ function DashboardAdmin() {
             <br />
             Connecté en {userEmail} !
           </div>
-          <span
+          {userEmail === "ticketmanager@festival-aix.com"
+            ? <span
             className="pointer-cursor"
             onClick={() => navigate("/users-management")}
             style={{ marginRight: 25 }}
@@ -217,6 +218,7 @@ function DashboardAdmin() {
               alt="users"
             />
           </span>
+          : ""}
         </div>
         <div className="dashboard-content-body">
           <div className="dashboard-content-serchbar-container">
