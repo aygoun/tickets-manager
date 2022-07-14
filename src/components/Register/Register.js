@@ -111,13 +111,12 @@ function Register() {
               />
             </div>
             <div className="login-form-button-container">
-              <a
-                href="#"
-                className="login-form-validate-a"
+              <span
+                className="login-form-validate-a cursor-pointer"
                 onClick={handleSubmit}
               >
                 <div className="login-form-validate-text">Valider</div>
-              </a>
+              </span>
               <Dialog open={open} onClose={handleClose}>
                   <DialogTitle>Entrer le code à 4 chiffre envoyé sur : {email}</DialogTitle>
                   <DialogContent>
