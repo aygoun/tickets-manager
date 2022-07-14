@@ -13,8 +13,8 @@ import {
   onSnapshot,
   startAfter,
   limit,
-  signOut,
 } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import Button from "@mui/material/Button";
 
 function Dashboard() {

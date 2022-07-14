@@ -11,7 +11,8 @@ import {
   Button,
 } from "@mui/material";
 import { db, auth } from "../../firebase";
-import { doc, setDoc, updateDoc, increment, signOut } from "firebase/firestore";
+import { doc, setDoc, updateDoc, increment } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
 
 function NewTicket() {

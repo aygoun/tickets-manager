@@ -5,7 +5,6 @@ import remove from "../../assets/remove.png";
 import { useNavigate } from "react-router-dom";
 import "./UserManagementAdmin.css";
 import {
-  signOut,
   collection,
   query,
   where,
@@ -13,6 +12,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";

@@ -15,8 +15,8 @@ import {
   limit,
   doc,
   getDoc,
-  signOut,
 } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import users from "../../assets/users.png";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
