@@ -9,7 +9,6 @@ import {
   collection,
   query,
   where,
-  getDocs,
   orderBy,
   onSnapshot,
   startAfter,
@@ -19,8 +18,7 @@ import Button from "@mui/material/Button";
 
 function Dashboard() {
   let navigate = useNavigate();
-
-  const userEmail = sessionStorage.getItem("userEmail");
+  const [userEmail, setUserEmail] = useState(sessionStorage.getItem("userEmail"));
   const [allUserTickets, setAllUserTickets] = useState([]);
   const [userTickets, setUserTickets] = useState([]);
   const [noTickets, setNoTickets] = useState("");
@@ -36,7 +34,7 @@ function Dashboard() {
   
   const handleChange = () => {
     const next = query(collection(db, "tickets"), limit(25), orderBy("date", "desc"), startAfter(lastDoc));
-    const querySnapshot = onSnapshot (next, (querySnapshot) => {
+    onSnapshot (next, (querySnapshot) => {
       const tickets = querySnapshot.docs.map((doc) => {
         return {
           id: doc.id,
@@ -44,7 +42,7 @@ function Dashboard() {
         };
       });
       if (tickets.length === 0) {
-        setNoTickets("Aucun ticket");
+        setNoTickets("Aucun autre ticket");
       }else{
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
         setLastDoc(lastVisible);
@@ -80,7 +78,7 @@ function Dashboard() {
 
   const fetchTickets = async () => {
     const q = query(collection(db, "tickets"), limit(25), where("from", "==", userEmail), orderBy("date", "desc")) ;
-    const querySnapshot = onSnapshot(q, (querySnapshot) => {
+     onSnapshot(q, (querySnapshot) => {
       const tickets = querySnapshot.docs.map((doc) => {
         return {
           id: doc.id,
@@ -121,16 +119,21 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
-      fetchTickets();
-    }
     auth.onAuthStateChanged((user) => {
       if (user) {
+        setUserEmail(user.email);
+        sessionStorage.setItem("userEmail", user.email);
         console.log("User is logged in");
       } else {
+        user.signOut();
+        sessionStorage.clear();
         navigate("/");
       }
     });
+    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
+      fetchTickets();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userTickets, navigate]);
 
   return (
@@ -141,12 +144,14 @@ function Dashboard() {
           <div className="dashboard-content-header-title">
             👋 Bonjour {userEmail} !
           </div>
-          <a href="#" onClick={handleNewTicket}>
+          <span 
+          className="pointer-cursor" onClick={handleNewTicket}>
             <img
               src={plus}
+              alt="plus"
               className="dashboard-content-header-newTicketButton"
             />
-          </a>
+          </span>
         </div>
         <div className="dashboard-content-body">
           <div className="dashboard-content-title">Mes tickets :</div>

@@ -44,7 +44,7 @@ function TicketDetailAdmin(props) {
   let dateTmp = new Date(ticket.date.seconds * 1000);
   let dateString = dateTmp.toLocaleDateString();
   let timeString = dateTmp.toLocaleTimeString();
-  const [date, setDate] = useState(dateString + " " + timeString);
+  const date = useState(dateString + " " + timeString);
   const theme = useTheme();
   const [personName, setPersonName] = React.useState(ticket.affectedTo);
 
@@ -110,7 +110,7 @@ function TicketDetailAdmin(props) {
 
     //Update affectedTo field in db tickets
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    if (ticket.status == "Résolu") {
+    if (ticket.status === "Résolu") {
       updateDoc(docRef, { affectedTo: personName, status: "Résolu" });
     }
     else if (personName.length === 0) {
@@ -119,6 +119,7 @@ function TicketDetailAdmin(props) {
     else{
       updateDoc(docRef, { affectedTo: personName, status: "Affecté" });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personName]);
 
   return (
@@ -166,21 +167,23 @@ function TicketDetailAdmin(props) {
               </Select>
             </FormControl>
           </div>
-          <div className="ticket-preview-info-status-container">
-            {ticket.status.toUpperCase()}
-          </div>
-          <span className="flex1 span-button" onClick={() => handleSolve()}>
-            <img src={validate} className="ticket-preview-close-img" width="35" />
-          </span>
-          <span className="flex1 span-button" onClick={() => handleDelete()}>
-            <img src={remove} className="ticket-preview-close-img" width="35" />
-          </span>
-          <span
-            className="flex1 span-button"
-            onClick={() => { isAdmin ? navigate("/view-ticket:" + ticket.ticketID + ":Y") : navigate("/view-ticket:" + ticket.ticketID + ":N") }}
-          >
-            <img src={arrow} className="ticket-preview-info-img" width="35" />
-          </span>
+          <div className="ticket-preview-info-status-maincontainer">
+            <div className="ticket-preview-info-status-container">
+              {ticket.status.toUpperCase()}
+            </div>
+            <span className="flex1 span-button" onClick={() => handleSolve()}>
+              <img src={validate} className="ticket-preview-close-img" alt="validate" width="35" />
+            </span>
+            <span className="flex1 span-button" onClick={() => handleDelete()}>
+              <img src={remove} className="ticket-preview-close-img" alt="delete" width="35" />
+            </span>
+            <span
+              className="flex1 span-button"
+              onClick={() => { isAdmin ? navigate("/view-ticket:" + ticket.ticketID + ":Y") : navigate("/view-ticket:" + ticket.ticketID + ":N") }}
+            >
+              <img src={arrow} className="ticket-preview-info-img"alt="preview" width="35" />
+            </span>
+            </div>
         </div>
       </div>
     </div>

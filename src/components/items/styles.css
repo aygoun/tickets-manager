@@ -58,6 +58,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    flex-wrap: wrap;
 }
 .ticket-preview-tag-container{
     flex-grow: 1!important;
@@ -65,6 +66,7 @@
     margin-right: 1rem;
 }
 .ticket-preview-info-status-container{
+    flex-grow: 1!important;
     margin-right: 1rem;
     background-color: black;
     padding: 0.7rem;
@@ -78,6 +80,12 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-end!important;
+    align-items: center;
+}
+.ticket-preview-info-status-maincontainer{
+    flex-grow: 1!important;
+    display: flex;
+    flex-direction: row;
     align-items: center;
 }
 .ticket-preview-info-img{

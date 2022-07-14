@@ -15,12 +15,11 @@ import { doc, getDoc } from "firebase/firestore";
 
 function ViewTicket(props) {
   let navigate = useNavigate();
-  let email = sessionStorage.getItem("userEmail");
   let idTmp = useParams().id;
   let isAdminTmp = useParams().admin;
   
   let isAdmin = false;
-  if (isAdminTmp == "Y"){
+  if (isAdminTmp === "Y"){
     isAdmin = true;
   }
   let id = idTmp.substring(1);
@@ -55,9 +54,12 @@ function ViewTicket(props) {
       if (user) {
         console.log("User is logged in");
       } else {
+        user.signOut();
+        sessionStorage.clear();
         navigate("/");
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   return (
