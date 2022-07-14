@@ -66,7 +66,11 @@ function NewTicket() {
       if (user) {
         console.log("User is logged in");
       } else {
-        user.signOut();
+        signOut(auth).then(() => {
+          // Sign-out successful.
+        }).catch((error) => {
+          // An error happened.
+        });
         sessionStorage.clear();
         navigate("/");
       }
