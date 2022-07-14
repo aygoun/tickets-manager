@@ -24,20 +24,13 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const [open, setOpen] = useState(false);
-  const [open2, setOpen2] = useState(false);
   const [passwordForgotten, setPasswordForgotten] = useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
   };
-  const handleClickOpen2 = () => {
-    setOpen2(true);
-  };
   const handleClose = () => {
     setOpen(false);
-  };
-  const handleClose2 = () => {
-    setOpen2(false);
   };
 
   const handleSubmit = () => {
@@ -46,8 +39,8 @@ function Login() {
     if (
       email.length < 17 ||
       password.length < 6 ||
-      emailSplited.length != 2 ||
-      emailSplited[1] != "festival-aix.com"
+      emailSplited.length !== 2 ||
+      emailSplited[1] !== "festival-aix.com"
     ) {
       alert("Veuillez remplir tous les champs");
     } else {
@@ -61,7 +54,6 @@ function Login() {
           console.log("USER SIGN IN AS: " + email);
         })
         .catch((error) => {
-          const errorCode = error.code;
           const errorMessage = error.message;
           alert("An error occured: " + errorMessage);
         });
@@ -77,9 +69,8 @@ function Login() {
         alert("Un email pour reinitialiser votre mot de passe vous a été envoyé.");
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
-        alert(errorCode);
+        alert("Error: " + errorMessage);
       });
   };
   return (
@@ -97,7 +88,7 @@ function Login() {
                 placeholder="exemple@festival-aix.com"
                 className="login-form-input"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
               />
             </div>
             <div className="login-form-body-input">
@@ -110,22 +101,20 @@ function Login() {
               />
             </div>
             <div className="login-form-button-container">
-              <a
-                href="#"
-                className="login-form-validate-a"
+              <span
+                className="login-form-validate-a cursor-pointer"
                 onClick={() => handleSubmit()}
               >
                 <div className="login-form-validate-text">Valider</div>
-              </a>
+              </span>
             </div>
             <div>
-              <a
-                href="#"
-                className="login-form-first-connexion-a login-form-validate-a"
+              <span
+                className="login-form-first-connexion-a login-form-validate-a pointer-cusor"
                 onClick={handleClickOpen}
               >
                 Mot de passe oublié ?
-              </a>
+              </span>
               <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Entrer votre email</DialogTitle>
                 <DialogContent>

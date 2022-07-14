@@ -11,10 +11,8 @@ import {
   Button,
 } from "@mui/material";
 import { db, auth } from "../../firebase";
-import { doc, addDoc, collection, setDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, setDoc, updateDoc, increment } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
-import Axios from "axios";
-
 
 function NewTicket() {
   let navigate = useNavigate();
@@ -68,6 +66,8 @@ function NewTicket() {
       if (user) {
         console.log("User is logged in");
       } else {
+        user.signOut();
+        sessionStorage.clear();
         navigate("/");
       }
     });

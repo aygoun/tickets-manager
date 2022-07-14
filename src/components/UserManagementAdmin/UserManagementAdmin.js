@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import { auth, db } from "../../firebase";
-import plus from "../../assets/plus.png";
 import remove from "../../assets/remove.png";
 import { useNavigate } from "react-router-dom";
 import "./UserManagementAdmin.css";
@@ -11,7 +10,6 @@ import {
   where,
   getDocs,
   doc,
-  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import Button from "@mui/material/Button";
@@ -71,9 +69,11 @@ function UserManagementAdmin() {
       getUsers();
     }
     auth.onAuthStateChanged((user) => {
-      if (user) {
+      if (user && user.email === sessionStorage.getItem("userEmail")) {
         console.log("User is logged in");
       } else {
+        user.signOut();
+        sessionStorage.clear();
         navigate("/");
       }
     });

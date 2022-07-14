@@ -1,7 +1,7 @@
 import "./Register.css";
 import React, { useState } from "react";
 import Header from "../items/Header";
-import { auth, db } from "../../firebase";
+import { db } from "../../firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -36,15 +36,15 @@ function Register() {
     if (
       email.length < 17 ||
       password.length < 6 ||
-      emailSplited.length != 2 ||
-      emailSplited[1] != "festival-aix.com"
+      emailSplited.length !== 2 ||
+      emailSplited[1] !== "festival-aix.com"
     ) {
       alert("Veuillez remplir tous les champs");
     } else {
       //send api request
       const response = await Axios('http://192.168.11.245:8080/mail:' + email);
       console.log(response.data);
-      if (response.data == "KO") {
+      if (response.data === "KO") {
         alert("Une erreur est survenue, veuillez réessayer");
       }
       else {
@@ -74,7 +74,6 @@ function Register() {
           navigate("/dashboard");
         })
         .catch((error) => {
-          const errorCode = error.code;
           const errorMessage = error.message;
           alert("Erreur: " + errorMessage);
         });
