@@ -118,10 +118,10 @@ function Register() {
                 <div className="login-form-validate-text">Valider</div>
               </span>
               <Dialog open={open} onClose={handleClose}>
-                  <DialogTitle>Entrer le code à 4 chiffre envoyé sur : {email}</DialogTitle>
+                  <DialogTitle>Entrer le code à 4 chiffres envoyé à : {email}</DialogTitle>
                   <DialogContent>
                     <DialogContentText>
-                      Vous avez reçu un mail pour vérifier votre compte. <br/>Le délai d'envoi est de d'environ 1 minutes.
+                      Vous avez reçu un mail pour vérifier votre compte. <br/>Le délai d'envoie est de d'environ 1 minute.
                     </DialogContentText>
                     <TextField
                       autoFocus
