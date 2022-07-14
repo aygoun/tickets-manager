@@ -69,7 +69,7 @@ function UserManagementAdmin() {
       getUsers();
     }
     auth.onAuthStateChanged((user) => {
-      if (user && user.email === sessionStorage.getItem("userEmail")) {
+      if (user && user.email === sessionStorage.getItem("userEmail") && user.email !== "ticketmanager@festival-aix.com") {
         console.log("User is logged in");
       } else {
         user.signOut();
