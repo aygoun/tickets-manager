@@ -120,6 +120,9 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
+      fetchTickets();
+    }
     auth.onAuthStateChanged((user) => {
       if (user) {
         setUserEmail(user.email);
@@ -131,13 +134,11 @@ function Dashboard() {
         }).catch((error) => {
           // An error happened.
         });
+        console.log("User is logged out");
         sessionStorage.clear();
         navigate("/");
       }
     });
-    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
-      fetchTickets();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userTickets, navigate]);
 
