@@ -72,7 +72,11 @@ function UserManagementAdmin() {
       if (user && user.email === sessionStorage.getItem("userEmail") && user.email === "ticketmanager@festival-aix.com") {
         console.log("User is logged in");
       } else {
-        user.signOut();
+        signOut(auth).then(() => {
+          // Sign-out successful.
+        }).catch((error) => {
+          // An error happened.
+        });
         sessionStorage.clear();
         navigate("/");
       }
