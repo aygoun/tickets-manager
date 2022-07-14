@@ -11,7 +11,8 @@ import {
   Button,
 } from "@mui/material";
 import { db, auth } from "../../firebase";
-import { doc, getDoc, signOut } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 
 function ViewTicket(props) {
   let navigate = useNavigate();
