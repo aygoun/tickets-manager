@@ -14,7 +14,8 @@ import {
   startAfter,
   limit,
   doc,
-  getDoc
+  getDoc,
+  signOut,
 } from "firebase/firestore";
 import users from "../../assets/users.png";
 import Button from "@mui/material/Button";
