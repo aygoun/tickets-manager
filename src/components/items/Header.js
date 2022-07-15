@@ -1,5 +1,5 @@
 import "./styles.css";
-import React, { Component } from 'react';
+import React from 'react';
 import { auth } from '../../firebase';
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
@@ -17,15 +17,14 @@ function Header(props) {
   return (
     <div className="header-container">
       <div className="header-img-logo-container">
-        <img src={logo} className="header-img-logo" />
+        <img src={logo} alt="logo" className="header-img-logo" />
         <div className="header-title">| Ticket Manager</div>
       </div>
       {isLogout && (
         <div className="header-logout-link">
-          <a className="header-logout-a" onClick={handleLogOut}>
-            {/*Deconnexion*/}
-            <img src={signout} className="header-logout-img" />
-          </a>
+          <span className="header-logout-a cursor-pointer" onClick={handleLogOut}>
+            <img src={signout} alt="logout" className="header-logout-img" />
+          </span>
         </div>
       )}
     </div>
