@@ -24,6 +24,12 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
+import { CSVLink } from "react-csv";
+import Dialog  from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 function DashboardAdmin() {
   let navigate = useNavigate();
@@ -39,6 +45,9 @@ function DashboardAdmin() {
   const [lastDoc, setLastDoc] = useState(null);
   const [search, setSearch] = useState("");
   const [tag, setTag] = useState("Tous");
+  const [csvData, setCsvData] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+
 
   const getUserPermissions = async () => {
     const docRef = doc(db, "users", userEmail);
@@ -129,7 +138,7 @@ function DashboardAdmin() {
     if (value.length > 3) {
       let q = query(collection(db, "tickets"), where("object", "==", value), orderBy("date", "desc"));
       let qUsername = query(collection(db, "tickets"), where("from", "==", value), orderBy("date", "desc"));
-      if (tag !== "Tous" ){
+      if (tag !== "Tous") {
         q = query(collection(db, "tickets"), where("object", "==", value), where("tag", "==", tag), orderBy("date", "desc"));
         qUsername = query(collection(db, "tickets"), where("from", "==", value), where("tag", "==", tag), orderBy("date", "desc"));
       }
@@ -157,7 +166,7 @@ function DashboardAdmin() {
       fetchTickets();
     }
     else {
-      console.log("HELLO"+tagValue);
+      console.log("HELLO" + tagValue);
       let q = query(collection(db, "tickets"), where("tag", "==", tagValue), limit(100), orderBy("date", "desc"));
       const querySnapshot = await getDocs(q);
       let tickets = [];
@@ -196,6 +205,40 @@ function DashboardAdmin() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  };
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+
+  const headers = [
+    { label: "Expéditeur", key: "from" },
+    { label: "Tag", key: "tag" },
+    { label: "Résumé", key: "object" },
+    { label: "Détails", key: "body" },
+    { label: "Statut", key: "status" },
+    { label: "Date", key: "date" },
+    { label: "Affecté à", key: "affectedTo" },
+    { label: "ID", key: "ticketID" },
+  ];
+
+  const handleExport = () => {
+    handleClickOpen();
+    //get all tickets data from the database and return data
+    const q = query(collection(db, "tickets"), orderBy("date", "desc"));
+    getDocs(q).then((querySnapshot) => {
+      var tickets = [];
+      querySnapshot.forEach((doc) => {
+        console.log("Doc: " + doc.data());
+        tickets.push(doc.data());
+      });
+      setCsvData(tickets);
+      console.log("TEST");
+    });
+  };
+
+
   return (
     <div>
       <Header isLogout={true} />
@@ -206,19 +249,52 @@ function DashboardAdmin() {
             <br />
             Connecté en {userEmail} !
           </div>
-          {userEmail === "ticketmanager@festival-aix.com"
-            ? <span
-            className="pointer-cursor"
-            onClick={() => navigate("/users-management")}
-            style={{ marginRight: 25 }}
-          >
-            <img
-              src={users}
-              className="dashboard-content-header-newTicketButton"
-              alt="users"
-            />
-          </span>
-          : ""}
+          <div className="dashboard-admin-actions-container">
+            {userEmail === "ticketmanager@festival-aix.com"
+              ? <span
+                className="pointer-cursor flex1"
+                onClick={() => navigate("/users-management")}
+                style={{ marginRight: 25 }}
+              >
+                <img
+                  src={users}
+                  className="dashboard-content-header-newTicketButton"
+                  alt="users"
+                />
+              </span>
+              : ""}
+            <span
+              className="pointer-cursor flex1"
+            >
+              <Button variant="contained" onClick={handleExport}>Exporter</Button>
+              <Dialog open={openDialog} onClose={handleClose}>
+                <DialogTitle>Veuillez attendre le téléchargement des données</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    Le bouton "télécharger" sera disponible à la fin du téléchargement.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>Annuler</Button>
+                  <CSVLink
+                    data={csvData}
+                    headers={headers}
+                    separator={";"}
+                    filename={"tickets.csv"}
+                    style={{ marginLeft: "1rem" }}
+                  >
+                    <Button
+                      variant="contained"
+                      onclick={handleClose}
+                    >
+                      {csvData.length > 0 ? "Télécharger" : "Chargement..."}
+                    </Button>
+                  </CSVLink>
+                </DialogActions>
+              </Dialog>
+
+            </span>
+          </div>
         </div>
         <div className="dashboard-content-body">
           <div className="dashboard-content-serchbar-container">
@@ -276,25 +352,25 @@ function DashboardAdmin() {
               </div>
 
               <div className="dashboard-filter-tag-container">
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Sujet</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={tag}
-                  label="Sujet"
-                  onChange={(e) => handleTagChange(e.target.value)}
-                >
-                  <MenuItem value={"Tous"}>Tous</MenuItem>
-                  <MenuItem value={"Logiciels"}>Logiciels</MenuItem>
-                  <MenuItem value={"Matériels"}>Matériels</MenuItem>
-                  <MenuItem value={"Prêt"}>Prêt</MenuItem>
-                  <MenuItem value={"Comptes"}>Comptes</MenuItem>
-                  <MenuItem value={"Réseaux"}>Réseaux</MenuItem>
-                  <MenuItem value={"Déménagement"}>Déménagement</MenuItem>
-                  <MenuItem value={"Autre"}>Autre</MenuItem>
-                </Select>
-              </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Sujet</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={tag}
+                    label="Sujet"
+                    onChange={(e) => handleTagChange(e.target.value)}
+                  >
+                    <MenuItem value={"Tous"}>Tous</MenuItem>
+                    <MenuItem value={"Logiciels"}>Logiciels</MenuItem>
+                    <MenuItem value={"Matériels"}>Matériels</MenuItem>
+                    <MenuItem value={"Prêt"}>Prêt</MenuItem>
+                    <MenuItem value={"Comptes"}>Comptes</MenuItem>
+                    <MenuItem value={"Réseaux"}>Réseaux</MenuItem>
+                    <MenuItem value={"Déménagement"}>Déménagement</MenuItem>
+                    <MenuItem value={"Autre"}>Autre</MenuItem>
+                  </Select>
+                </FormControl>
               </div>
             </div>
 
@@ -311,7 +387,7 @@ function DashboardAdmin() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
