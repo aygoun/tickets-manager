@@ -17,6 +17,7 @@ function App() {
     <div>
       <BrowserRouter>
         <Routes>
+          {/*USER ROUTES*/}
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/view-ticket:id:admin" element={<ViewTicket />} />
@@ -25,6 +26,8 @@ function App() {
           {/*ADMIN ROUTES*/}
           <Route path="/admin" element={<DashboardAdmin />}/>
           <Route path="/users-management" element={<UserManagementAdmin />}/>
+          {/*ERROR PAGE*/}
+          <Route path="*" element={<h1 style={{textAlign: "center"}}>Erreur 404: Page inconnue !</h1>} />
         </Routes>
       </BrowserRouter>
     </div>

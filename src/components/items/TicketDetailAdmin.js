@@ -46,7 +46,7 @@ function TicketDetailAdmin(props) {
   let timeString = dateTmp.toLocaleTimeString();
   const date = useState(dateString + " " + timeString);
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState(ticket.affectedTo);
+  const [adminAffectedMails, setPersonName] = useState(ticket.affectedTo);
 
   const getUsers = async () => {
     setNames([]);
@@ -62,43 +62,44 @@ function TicketDetailAdmin(props) {
     setNames(usersTmp);
   };
 
-  const handleChange = (event) => {
+  const handleChangeAffectation = (event) => {
     const {
       target: { value },
     } = event;
+    //Get new between personName and value
+    const diff = value.filter((x) => !adminAffectedMails.includes(x));
     setPersonName(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
-  };
-
-  const handleSolve = () => {
-    const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    updateDoc(docRef, { status: "Résolu" });
-    fetch('http://192.168.11.245:8080/update', {
+    if (diff.length > 0) {
+      //New assignation
+      fetch('http://localhost:8080/affected', { //192.168.11.245
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Résolu", 
+          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Affecté", affectedTo: diff, id: ticket.publicID
         })
       });
+      handleUpdate("Affecté");
+    }
   };
-  
-  const handleDelete = () => {
-    console.log("HELLO: " + ticket.ticketID);
+
+  const handleUpdate = (newStatus) => {
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    updateDoc(docRef, { status: "Fermé" });
-    fetch('http://localhost:8080/update', {
+    console.log("AffectedTo: ", adminAffectedMails);
+    updateDoc(docRef, { status: newStatus });
+    fetch('http://localhost:8080/update', { //192.168.11.245
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Fermé", 
+          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: newStatus, affectedTo: adminAffectedMails, id: ticket.publicID
         })
       });
   };
@@ -111,16 +112,16 @@ function TicketDetailAdmin(props) {
     //Update affectedTo field in db tickets
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     if (ticket.status === "Résolu") {
-      updateDoc(docRef, { affectedTo: personName, status: "Résolu" });
+      updateDoc(docRef, { affectedTo: adminAffectedMails, status: "Résolu" });
     }
-    else if (personName.length === 0) {
+    else if (adminAffectedMails.length === 0) {
       updateDoc(docRef, { affectedTo: [], status: "Ouvert" });
     }
     else{
-      updateDoc(docRef, { affectedTo: personName, status: "Affecté" });
+      updateDoc(docRef, { affectedTo: adminAffectedMails, status: "Affecté" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personName]);
+  }, [adminAffectedMails]);
 
   return (
     <div className="ticket-preview-container">
@@ -143,8 +144,8 @@ function TicketDetailAdmin(props) {
                 labelId="demo-multiple-chip-label"
                 id="demo-multiple-chip"
                 multiple
-                value={personName}
-                onChange={handleChange}
+                value={adminAffectedMails}
+                onChange={handleChangeAffectation}
                 input={<OutlinedInput id="select-multiple-chip" label="Assigné à" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -159,7 +160,7 @@ function TicketDetailAdmin(props) {
                   <MenuItem
                     key={name}
                     value={name}
-                    style={getStyles(name, personName, theme)}
+                    style={getStyles(name, adminAffectedMails, theme)}
                   >
                     {name}
                   </MenuItem>
@@ -171,10 +172,10 @@ function TicketDetailAdmin(props) {
             <div className="ticket-preview-info-status-container">
               {ticket.status.toUpperCase()}
             </div>
-            <span className="flex1 span-button" onClick={() => handleSolve()}>
+            <span className="flex1 span-button" onClick={() => handleUpdate("Résolu")}>
               <img src={validate} className="ticket-preview-close-img" alt="validate" width="35" />
             </span>
-            <span className="flex1 span-button" onClick={() => handleDelete()}>
+            <span className="flex1 span-button" onClick={() => handleUpdate("Fermé")}>
               <img src={remove} className="ticket-preview-close-img" alt="delete" width="35" />
             </span>
             <span

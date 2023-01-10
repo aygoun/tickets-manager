@@ -47,6 +47,7 @@ function DashboardAdmin() {
   const [tag, setTag] = useState("Tous");
   const [csvData, setCsvData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [myAffectation, setMyAffectation] = useState(false);
 
 
   const getUserPermissions = async () => {
@@ -55,7 +56,7 @@ function DashboardAdmin() {
 
     if (docSnap.exists()) {
       if (docSnap.data().isAdmin === true) {
-        console.log("Checked");
+        console.log("Existing user");
       }
       else {
         navigate("/dashboard");
@@ -65,6 +66,16 @@ function DashboardAdmin() {
       console.log("No such document!");
     }
   };
+
+  const handleCheckbox = () => {
+    console.log("Checkbox: ", !myAffectation);
+    if (!myAffectation === false)
+    {
+      setTag("Tous");
+    }
+    fetchTickets(!myAffectation);
+    setMyAffectation(!myAffectation);
+  }
 
   const filterTickets = (tickets) => {
     setNoTickets("");
@@ -95,7 +106,14 @@ function DashboardAdmin() {
   };
 
   const handleChange = () => {
-    const next = query(collection(db, "tickets"), limit(50), orderBy("date", "desc"), startAfter(lastDoc));
+    let next;
+    if (myAffectation)
+    {
+      next = query(collection(db, "tickets"), limit(50), orderBy("date", "desc"), startAfter(lastDoc), where("affectedTo", "array-contains", userEmail));
+    }
+    else {
+      next = query(collection(db, "tickets"), limit(50), orderBy("date", "desc"), startAfter(lastDoc));
+    } 
     onSnapshot(next, (querySnapshot) => {
       const tickets = querySnapshot.docs.map((doc) => {
         return {
@@ -114,8 +132,14 @@ function DashboardAdmin() {
     );
   };
 
-  const fetchTickets = async () => {
-    const q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50));
+  const fetchTickets = async (status) => {
+    let q;
+    if (status) {      
+      q = query(collection(db, "tickets"), orderBy("date", "desc"), where("affectedTo", "array-contains", userEmail), limit(50));
+    }
+    else{
+      q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50));
+    }
     onSnapshot(q, (querySnapshot) => {
       const tickets = querySnapshot.docs.map((doc) => {
         return {
@@ -155,6 +179,14 @@ function DashboardAdmin() {
         //console.log("Doc: " + doc.data());
         tickets.push(doc.data());
       });
+      if (value.length === 6){
+        let qID = query(collection(db, "tickets"), where("publicID", "==", value));
+        const querySnapshotID = await getDocs(qID);
+        querySnapshotID.forEach((doc) => {
+          tickets.push(doc.data());
+        }
+        );
+      }
       setUserTickets(tickets);
       filterTickets(tickets);
     }
@@ -163,11 +195,16 @@ function DashboardAdmin() {
   const handleTagChange = async (tagValue) => {
     setTag(tagValue);
     if (tagValue === "Tous") {
-      fetchTickets();
+      fetchTickets(myAffectation);
     }
     else {
-      console.log("HELLO" + tagValue);
-      let q = query(collection(db, "tickets"), where("tag", "==", tagValue), limit(100), orderBy("date", "desc"));
+      let q;
+      if (myAffectation) {
+        q = query(collection(db, "tickets"), where("tag", "==", tagValue), where("affectedTo", "array-contains", userEmail), limit(100), orderBy("date", "desc"));
+      }
+      else {
+        q = query(collection(db, "tickets"), where("tag", "==", tagValue), limit(100), orderBy("date", "desc"));
+      }
       const querySnapshot = await getDocs(q);
       let tickets = [];
       querySnapshot.forEach((doc) => {
@@ -182,16 +219,14 @@ function DashboardAdmin() {
 
   useEffect(() => {
     if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
-      fetchTickets();
-    }
-    if (userEmail !== "ticketmanager@festival-aix.com") {
-      getUserPermissions();
+      fetchTickets(myAffectation);
     }
     auth.onAuthStateChanged((user) => {
       if (user) {
         setUserEmail(user.email);
         sessionStorage.setItem("userEmail", user.email);
         console.log("User is logged in");
+        getUserPermissions();
       } else {
         signOut(auth).then(() => {
           // Sign-out successful.
@@ -204,6 +239,13 @@ function DashboardAdmin() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+      if (search.length === 0 && tag === "Tous") {
+        setUserTickets(allUserTickets);
+        filterTickets(allUserTickets);
+      }
+    }, [search])
 
   const handleClickOpen = () => {
     setOpenDialog(true);
@@ -220,6 +262,7 @@ function DashboardAdmin() {
     { label: "Statut", key: "status" },
     { label: "Date", key: "date" },
     { label: "Affecté à", key: "affectedTo" },
+    { label: "Public ID", key: "publicID"},
     { label: "ID", key: "ticketID" },
   ];
 
@@ -300,51 +343,77 @@ function DashboardAdmin() {
           <div className="dashboard-content-serchbar-container">
             <div className="dashboard-content-title">Tickets :</div>
             <div className="dashboard-content-title">
-              <TextField id="outlined-search" label="Résumé ou mail" type="search" value={search} onChange={(e) => handleSearchChange(e.target.value)} />
+              <TextField id="outlined-search" label="ID, résumé ou mail" type="search" value={search} onChange={(e) => handleSearchChange(e.target.value)} />
             </div>
           </div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu-main">
               <div className="dashboard-content-body-filtermenu">
                 <span
-                  onClick={() => setUserTickets(allUserTickets)}
+                  onClick={() => 
+                    {
+                      setUserTickets(allUserTickets);
+                      setTag("Tous")
+                    }}
                   className="dashboard-content-body-menu"
                 >
-                  <div className="dashboard-content-filter-choices">
+                  <div 
+                    className={tag === "Tous" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
                     TOUS ({allUserTickets.length})
                   </div>
                 </span>
                 <span
-                  onClick={() => setUserTickets(open)}
+                  onClick={() => {
+                    setUserTickets(open);
+                    setTag("Ouvert")
+                  }}
                   className="dashboard-content-body-menu"
                 >
-                  <div className="dashboard-content-filter-choices">
+                  <div
+                    className={tag === "Ouvert" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
                     OUVERT ({open.length})
                   </div>
                 </span>
                 <span
-                  onClick={() => setUserTickets(affected)}
+                  onClick={() =>
+                    {
+                      setUserTickets(affected);
+                      setTag("Affecté")
+                    }}
                   className="dashboard-content-body-menu"
                 >
-                  <div className="dashboard-content-filter-choices">
+                  <div
+                    className={tag === "Affecté" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
                     AFFECTÉ ({affected.length})
                   </div>
                 </span>
                 <span
-                  onClick={() => setUserTickets(solved)}
+                  onClick={() => {
+                    setUserTickets(solved);
+                    setTag("Résolu")
+                  }}
                   className="dashboard-content-body-menu"
                 >
-                  <div className="dashboard-content-filter-choices">
+                  <div 
+                    className={tag === "Résolu" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
                     RÉSOLU ({solved.length})
                   </div>
                 </span>
                 <span
-                  onClick={() => setUserTickets(closed)}
+                  onClick={() => 
+                    {
+                      setUserTickets(closed);
+                      setTag("Fermé")
+                    }}
                   className="dashboard-content-body-menu"
                 >
-                  <div
-                    className="dashboard-content-filter-choices"
-                    style={{ borderBottom: "0px solid" }}
+                  <div 
+                    className={tag === "Fermé" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    style={{ borderBottom: 0 }}
                   >
                     FERMÉ ({closed.length})
                   </div>
@@ -371,6 +440,11 @@ function DashboardAdmin() {
                     <MenuItem value={"Autre"}>Autre</MenuItem>
                   </Select>
                 </FormControl>
+              </div>
+
+              <div>
+                <input type="checkbox" id="myCheck" onClick={() => handleCheckbox()} />
+                <label for="myCheck">Afficher mes tickets affectés</label>
               </div>
             </div>
 
