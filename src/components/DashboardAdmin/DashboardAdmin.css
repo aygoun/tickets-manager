@@ -44,8 +44,6 @@
 .dashboard-content-body-filtermenu{
     border-radius: 5px;
     width: 100%;
-    background-color: #F24329;
-    color: #fff;
     margin-bottom: 1rem;
     flex: 1;
 }
@@ -55,7 +53,6 @@
 }
 .dashboard-content-filter-choices{
     border-bottom: 1px solid #ccc;
-    color: #fff;
     padding: 0.5em;
     font-size: 1rem;
     font-weight: 600;
@@ -86,4 +83,8 @@
     flex-wrap: wrap;
     align-items: center;
     margin-top: 1rem;
+}
+.active {
+    background-color: #F24328;
+    color: #fff;
 }
