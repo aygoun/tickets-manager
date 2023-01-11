@@ -42,7 +42,7 @@ function Register() {
       alert("Veuillez remplir tous les champs");
     } else {
       //send api request
-      const response = await Axios('http://localhost:8080/mail:' + email); //192.168.11.245
+      const response = await Axios('http://192.168.11.245:8080/mail:' + email);
       if (response.data === "KO") {
         alert("Une erreur est survenue, veuillez réessayer");
       }
