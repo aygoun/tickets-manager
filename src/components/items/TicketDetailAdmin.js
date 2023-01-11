@@ -64,7 +64,7 @@ function TicketDetailAdmin(props) {
   const handleUpdate = (newStatus) => {
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     updateDoc(docRef, { affectedTo: ticket.affectedTo, status: newStatus });
-    fetch('http://localhost:8080/update', { //192.168.11.245
+    fetch('http://192.168.11.245:8080/update', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -91,7 +91,7 @@ function TicketDetailAdmin(props) {
     if (differencesBtwTicketAndNow.length > 0) {
       handleUpdate("Affecté");
       //New assignation
-      fetch('http://localhost:8080/affected', { //192.168.11.245
+      fetch('http://192.168.11.245:8080/affected', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
