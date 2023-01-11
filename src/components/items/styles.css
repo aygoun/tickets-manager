@@ -6,7 +6,15 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     padding: 1rem;
+}
+.header-left-container{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-decoration: none;
 }
 .header-img-logo-container{
     flex: 1;

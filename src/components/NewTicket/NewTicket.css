@@ -46,7 +46,7 @@
     justify-content: space-between;
     align-items: center;
 }
-.newticket-cancel-button-flex-none{
+.alignEnd{
     align-self: flex-end;
 }
 .newticket-file-input-container{
