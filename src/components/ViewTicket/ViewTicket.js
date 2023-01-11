@@ -26,6 +26,7 @@ function ViewTicket(props) {
   let id = idTmp.substring(1);
   id = id.slice(0, -1);
   const [ticket, setTicket] = useState({});
+  const [affectedTo, setAffectedTo] = useState([]);
   const [date, setDate] = useState("");
 
   const getTicket = async () => {
@@ -43,6 +44,7 @@ function ViewTicket(props) {
       let timeString = date.toLocaleTimeString();
       setDate(dateString + " " + timeString);
       setTicket(docSnap.data());
+      setAffectedTo(docSnap.data().affectedTo);
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -121,6 +123,21 @@ function ViewTicket(props) {
             </div>
 
             <div className="newticket-body-input-container flex1">
+              <p>Votre ticket est affecté à :
+              {Object.entries(affectedTo).length > 0 ? (
+                  //Ticket AssignedTo is an array, iterates on it
+                  affectedTo.map((technician, index) => (
+                    <span key={index} style={{fontWeight: 600}}>
+                      {" "}{technician},
+                    </span>
+                  ))
+                ) : (
+                  " Aucun technicien")
+              }
+              </p>
+            </div>
+
+            <div className="newticket-body-input-container flex1">
               {ticket.file !== "" ? (  
                 <a href={ticket.file} target="_blank" rel="noreferrer">
                   <Button
@@ -136,7 +153,7 @@ function ViewTicket(props) {
                   </Button>
                 </a>)
               :
-                (<p>Pas de pièce jointe</p>)
+                (<p>Aucune pièce jointe</p>)
               }
             </div>
 

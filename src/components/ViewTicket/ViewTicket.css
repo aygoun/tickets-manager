@@ -7,11 +7,10 @@
 .viewticket-publicID{
     font-size: 1.2rem;
     font-weight: 700;
-    color: #000;
-    border: 1px solid #000;
+    color: #fff;
     padding: 10px;
     border-radius: 5px;
-    background-color: #f2f2f2;
+    background-color: #F24328;
 }
 .newticket-body-input-container {
     margin-bottom: 1em;

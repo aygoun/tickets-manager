@@ -180,12 +180,12 @@ function NewTicket() {
           
           <div className="flex1 newticket-validate-button-container">
             <div className="flex1">
-              <Button variant="contained" onClick={handleSubmit}>Envoyer</Button>
-            </div>
-            <div className="newticket-cancel-button-flex-none">
               <Button variant="outlined" onClick={() => navigate("/dashboard")}>
                 Annuler
               </Button>
+            </div>
+            <div className="alignEnd">
+              <Button variant="contained" onClick={handleSubmit}>Envoyer</Button>
             </div>
           </div>
         </div>
