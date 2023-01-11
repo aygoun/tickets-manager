@@ -28,6 +28,7 @@ function Dashboard() {
   const [affected, setAffected] = useState([]);
   const [solved, setSolved] = useState([]);
   const [lastDoc, setLastDoc] = useState(null);
+  const [tag, setTag] = useState("Tous");
 
   const handleNewTicket = () => {
     navigate("/new-ticket");
@@ -163,30 +164,77 @@ function Dashboard() {
           <div className="dashboard-content-title">Mes tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
-              <span
-                onClick={() => setUserTickets(allUserTickets)}
-                className="dashboard-content-body-menu"
-              >
-                <div className="dashboard-content-filter-choices">
-                  TOUS ({allUserTickets.length})
-                </div>
-              </span>
-              <span onClick={() => setUserTickets(open)} className="dashboard-content-body-menu" style={{ borderTopLeft: "100px" }}>
-                <div className="dashboard-content-filter-choices">OUVERT ({open.length})</div>
-              </span>
-              <span onClick={() => setUserTickets(affected)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices">
-                  AFFECTÉ ({affected.length})
-                </div>
-              </span>
-              <span onClick={() => setUserTickets(solved)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices">RÉSOLU ({solved.length})</div>
-              </span>
-              <span onClick={() => setUserTickets(closed)} className="dashboard-content-body-menu">
-                <div className="dashboard-content-filter-choices" style={{ borderBottom: '0px solid' }}>FERMÉ ({closed.length})</div>
-              </span>
+            <span
+                  onClick={() => 
+                    {
+                      setUserTickets(allUserTickets);
+                      setTag("Tous")
+                    }}
+                  className="dashboard-content-body-menu"
+                >
+                  <div 
+                    className={tag === "Tous" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
+                    TOUS ({allUserTickets.length})
+                  </div>
+                </span>
+                <span
+                  onClick={() => {
+                    setUserTickets(open);
+                    setTag("Ouvert")
+                  }}
+                  className="dashboard-content-body-menu"
+                >
+                  <div
+                    className={tag === "Ouvert" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
+                    OUVERT ({open.length})
+                  </div>
+                </span>
+                <span
+                  onClick={() =>
+                    {
+                      setUserTickets(affected);
+                      setTag("Affecté")
+                    }}
+                  className="dashboard-content-body-menu"
+                >
+                  <div
+                    className={tag === "Affecté" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
+                    AFFECTÉ ({affected.length})
+                  </div>
+                </span>
+                <span
+                  onClick={() => {
+                    setUserTickets(solved);
+                    setTag("Résolu")
+                  }}
+                  className="dashboard-content-body-menu"
+                >
+                  <div 
+                    className={tag === "Résolu" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                  >
+                    RÉSOLU ({solved.length})
+                  </div>
+                </span>
+                <span
+                  onClick={() => 
+                    {
+                      setUserTickets(closed);
+                      setTag("Fermé")
+                    }}
+                  className="dashboard-content-body-menu"
+                >
+                  <div 
+                    className={tag === "Fermé" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    style={{ borderBottom: 0 }}
+                  >
+                    FERMÉ ({closed.length})
+                  </div>
+                </span>
             </div>
-            <div className=" dashboard-content-body-content-container">
+            <div className="dashboard-content-body-content-container">
               <div className="flex1 dashboard-content-body-content-subcontainer">
                 {userTickets &&
                   userTickets.map((ticket, key) => {

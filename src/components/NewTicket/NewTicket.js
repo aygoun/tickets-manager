@@ -10,9 +10,10 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { db, auth } from "../../firebase";
-import { doc, setDoc, updateDoc, increment } from "firebase/firestore";
+import { db, auth, storage } from "../../firebase";
+import { doc, setDoc, updateDoc, increment, query, where, getDocs, collection } from "firebase/firestore";
 import { signOut } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 function NewTicket() {
@@ -22,41 +23,77 @@ function NewTicket() {
   const [tag, setTag] = useState("");
   const [resume, setResume] = useState("");
   const [description, setDescription] = useState("");
+  const [file, setFile] = useState("");
+
+  const checkIfIDExists = async (id) => {
+    const ticketsRef = collection(db, "tickets");
+    const ticketsQuery = query(ticketsRef, where("ticketID", "==", id));
+    const ticketsQuerySnapshot = await getDocs(ticketsQuery);
+    const ticketsDocs = ticketsQuerySnapshot.docs;
+    return ticketsDocs.length;
+  };
+
+  const uploadFile = async (id) => {
+    const fileRef = ref(storage, `${id}/${file.name}`);
+    await uploadBytes(fileRef, file)
+    .then((snapshot) => {
+      console.log('Uploaded a blob or file!');
+    });
+    const url = await getDownloadURL(fileRef);
+    return url;
+  };
 
   const handleSubmit = async () => {
-    console.log("TAG: " + tag);
-    console.log("Resume: " + resume);
-    console.log("Description: " + description);
     if (tag !== "" && resume !== "" && description !== "") {
+      let id = uuidv4();
+      //Get 6 first char of id:
+      let id6 = id.slice(0, 6);
+      
+      //Check if id already exists in the database with where ticketID = id4 ?
+      //If yes, generate a new id and check again
+      //If no, set the ticket with the id4
+      let idExists = await checkIfIDExists(id6);
+      while (idExists !== 0) {
+        id = uuidv4();
+        id6 = id.slice(0, 6);
+        idExists = await checkIfIDExists(id6);
+      };
+
+      let filePath = "";
+      if (file !== "") {
+        filePath = await uploadFile(id);
+      }
+      
+      let data = {
+        tag: tag,
+        object: resume,
+        body: description,
+        date: new Date(),
+        status: "Ouvert",
+        from: email,
+        ticketID: id,
+        affectedTo: [],
+        publicID: id6,
+        file: filePath,
+      };
+      await setDoc(doc(db, "tickets", id), data);
+
+      //Incremente the number of tickets in the user profile
+      const userRef = doc(db, "users", email);
+      await updateDoc(userRef, {
+        nbTickets: increment(1)
+      });
       //SEND API REQUEST:
-      fetch('http://192.168.11.245:8080/ticket', {
+      fetch('http://localhost:8080/ticket', { //http://192.168.11.245:8080/ticket
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tag: tag, object: resume, body: description, from: email
+          tag: tag, object: resume, body: description, from: email, id: id6
         })
       });
-        let id = uuidv4();
-        let data = {
-          tag: tag,
-          object: resume,
-          body: description,
-          date: new Date(),
-          status: "Ouvert",
-          from: email,
-          ticketID: id,
-          affectedTo: [],
-        };
-        await setDoc(doc(db, "tickets", id), data);
-
-        //Incremente the number of tickets in the user profile
-        const userRef = doc(db, "users", email);
-        await updateDoc(userRef, {
-          nbTickets: increment(1)
-        });
         navigate("/dashboard");
     } else {
       alert("Veuillez remplir tous les champs");
@@ -128,14 +165,27 @@ function NewTicket() {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+
+          <div className="newticket-file-input-container flex1">
+            <label for="file" className="newticket-file-input-label">
+              Ajouter un fichier (optionel)
+            </label>
+            <input
+              type="file"
+              accept="*"
+              className="newticket-file-input"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+          </div>
+          
           <div className="flex1 newticket-validate-button-container">
             <div className="flex1">
-              <Button variant="contained" onClick={handleSubmit}>Envoyer</Button>
-            </div>
-            <div className="newticket-cancel-button-flex-none">
               <Button variant="outlined" onClick={() => navigate("/dashboard")}>
                 Annuler
               </Button>
+            </div>
+            <div className="alignEnd">
+              <Button variant="contained" onClick={handleSubmit}>Envoyer</Button>
             </div>
           </div>
         </div>

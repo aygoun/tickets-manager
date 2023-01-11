@@ -26,6 +26,7 @@ function ViewTicket(props) {
   let id = idTmp.substring(1);
   id = id.slice(0, -1);
   const [ticket, setTicket] = useState({});
+  const [affectedTo, setAffectedTo] = useState([]);
   const [date, setDate] = useState("");
 
   const getTicket = async () => {
@@ -43,6 +44,7 @@ function ViewTicket(props) {
       let timeString = date.toLocaleTimeString();
       setDate(dateString + " " + timeString);
       setTicket(docSnap.data());
+      setAffectedTo(docSnap.data().affectedTo);
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -74,7 +76,8 @@ function ViewTicket(props) {
         <div className="newticket-maincontainer">
           <div className="newticket-subcontainer">
             <div className="newticket-header-container flex1">
-              <h2>{date}</h2>
+              <h2 className="viewticket-date">{date}</h2>
+              <span className="viewticket-publicID">ID: {ticket.publicID}</span>
             </div>
             <div className="newticket-ticket-header-container flex1">
               <div className="newticket-tag-input-container">
@@ -118,6 +121,42 @@ function ViewTicket(props) {
                 disabled
               />
             </div>
+
+            <div className="newticket-body-input-container flex1">
+              <p>Votre ticket est affecté à :
+              {Object.entries(affectedTo).length > 0 ? (
+                  //Ticket AssignedTo is an array, iterates on it
+                  affectedTo.map((technician, index) => (
+                    <span key={index} style={{fontWeight: 600}}>
+                      {" "}{technician},
+                    </span>
+                  ))
+                ) : (
+                  " Aucun technicien")
+              }
+              </p>
+            </div>
+
+            <div className="newticket-body-input-container flex1">
+              {ticket.file !== "" ? (  
+                <a href={ticket.file} target="_blank" rel="noreferrer">
+                  <Button
+                    variant="outlined"
+                    style={{
+                      borderRadius: 35,
+                      backgroundColor: "#000",
+                      color: "#fff",
+                    }}
+                    disabled
+                    >
+                    Voir le fichier
+                  </Button>
+                </a>)
+              :
+                (<p>Aucune pièce jointe</p>)
+              }
+            </div>
+
             <div className="flex1 newticket-validate-button-container">
               <div className="flex1">
                 <Button

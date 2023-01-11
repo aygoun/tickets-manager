@@ -42,8 +42,7 @@ function Register() {
       alert("Veuillez remplir tous les champs");
     } else {
       //send api request
-      const response = await Axios('http://192.168.11.245:8080/mail:' + email);
-      console.log(response.data);
+      const response = await Axios('http://localhost:8080/mail:' + email); //192.168.11.245
       if (response.data === "KO") {
         alert("Une erreur est survenue, veuillez réessayer");
       }
@@ -121,7 +120,7 @@ function Register() {
                   <DialogTitle>Entrer le code à 4 chiffres envoyé à : {email}</DialogTitle>
                   <DialogContent>
                     <DialogContentText>
-                      Vous avez reçu un mail pour vérifier votre compte. <br/>Le délai d'envoie est de d'environ 1 minute.
+                      Vous avez reçu un mail pour vérifier votre compte. <br/>Le délai d'envoi est de d'environ 1 minute.
                     </DialogContentText>
                     <TextField
                       autoFocus

@@ -16,10 +16,12 @@ function Header(props) {
   };
   return (
     <div className="header-container">
-      <div className="header-img-logo-container">
-        <img src={logo} alt="logo" className="header-img-logo" />
-        <div className="header-title">| Ticket Manager</div>
-      </div>
+      <a href="/dashboard" className="header-left-container">
+        <div className="header-img-logo-container">
+            <img src={logo} alt="logo" className="header-img-logo" />
+            <div className="header-title">| Ticket Manager</div>
+        </div>
+      </a>
       {isLogout && (
         <div className="header-logout-link">
           <span className="header-logout-a cursor-pointer" onClick={handleLogOut}>
