@@ -153,10 +153,10 @@ function DashboardAdmin() {
           };
         }
       });
+      tickets = tickets.filter((ticket) => ticket.id !== -1);
       if (tickets.length === 0) {
         setNoTickets("Aucun ticket");
       } else {
-        tickets = tickets.filter((ticket) => ticket.id !== -1);
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
         setLastDoc(lastVisible);
         filterTickets(tickets);
