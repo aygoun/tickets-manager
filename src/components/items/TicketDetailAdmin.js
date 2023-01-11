@@ -17,7 +17,7 @@ import Chip from '@mui/material/Chip';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
+const MENU_PROPS = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
@@ -37,8 +37,8 @@ function getStyles(name, personName, theme) {
 
 function TicketDetailAdmin(props) {
   let navigate = useNavigate();
-  const ticket = props.ticket;
-  const isAdmin = props.isAdmin;
+  const { isAdmin } = props;
+  const { ticket } = props;
   const [names, setNames] = useState([]);
 
   let dateTmp = new Date(ticket.date.seconds * 1000);
@@ -46,7 +46,6 @@ function TicketDetailAdmin(props) {
   let timeString = dateTmp.toLocaleTimeString();
   const date = useState(dateString + " " + timeString);
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState(ticket.affectedTo);
 
   const getUsers = async () => {
     setNames([]);
@@ -62,65 +61,65 @@ function TicketDetailAdmin(props) {
     setNames(usersTmp);
   };
 
-  const handleChange = (event) => {
+  const handleUpdate = (newStatus) => {
+    const docRef = doc(db, "tickets", "" + ticket.ticketID);
+    updateDoc(docRef, { affectedTo: ticket.affectedTo, status: newStatus });
+    fetch('http://localhost:8080/update', { //192.168.11.245
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tag: ticket.tag,
+          object: ticket.object,
+          body: ticket.body,
+          from: ticket.from,
+          status: newStatus,
+          id: ticket.publicID
+        })
+      });
+  };
+
+  const handleChangeAffectation = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
-
-  const handleSolve = () => {
-    const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    updateDoc(docRef, { status: "Résolu" });
-    fetch('http://192.168.11.245:8080/update', {
+    //Get new between personName and value
+    const differencesBtwTicketAndNow = value.filter((x) => !ticket.affectedTo.includes(x));
+    ticket.affectedTo = value;
+    if (differencesBtwTicketAndNow.length > 0) {
+      handleUpdate("Affecté");
+      //New assignation
+      fetch('http://localhost:8080/affected', { //192.168.11.245
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Résolu", 
+          tag: ticket.tag,
+          object: ticket.object,
+          body: ticket.body,
+          from: ticket.from,
+          status: "Affecté",
+          diff: differencesBtwTicketAndNow,
+          affectedTo: ticket.affectedTo,
+          id: ticket.publicID
         })
       });
-  };
-  
-  const handleDelete = () => {
-    console.log("HELLO: " + ticket.ticketID);
-    const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    updateDoc(docRef, { status: "Fermé" });
-    fetch('http://localhost:8080/update', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          tag: ticket.tag, object: ticket.object, body: ticket.body, from: ticket.from, status: "Fermé", 
-        })
-      });
+    }
+    else if (differencesBtwTicketAndNow.length === 0 && ticket.affectedTo.length === 0){
+      handleUpdate("Ouvert");
+    }
   };
 
   useEffect(() => {
     if (Object.entries(names).length === 0) {
       getUsers();
     }
-
-    //Update affectedTo field in db tickets
-    const docRef = doc(db, "tickets", "" + ticket.ticketID);
-    if (ticket.status === "Résolu") {
-      updateDoc(docRef, { affectedTo: personName, status: "Résolu" });
-    }
-    else if (personName.length === 0) {
-      updateDoc(docRef, { affectedTo: [], status: "Ouvert" });
-    }
-    else{
-      updateDoc(docRef, { affectedTo: personName, status: "Affecté" });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personName]);
+  }, []);
 
   return (
     <div className="ticket-preview-container">
@@ -143,8 +142,8 @@ function TicketDetailAdmin(props) {
                 labelId="demo-multiple-chip-label"
                 id="demo-multiple-chip"
                 multiple
-                value={personName}
-                onChange={handleChange}
+                value={ticket.affectedTo}
+                onChange={handleChangeAffectation}
                 input={<OutlinedInput id="select-multiple-chip" label="Assigné à" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -153,13 +152,13 @@ function TicketDetailAdmin(props) {
                     ))}
                   </Box>
                 )}
-                MenuProps={MenuProps}
+                MenuProps={MENU_PROPS}
               >
-                {names.map((name) => (
+                {names.map((name, index) => (
                   <MenuItem
-                    key={name}
+                    key={index}
                     value={name}
-                    style={getStyles(name, personName, theme)}
+                    style={getStyles(name, ticket.affectedTo, theme)}
                   >
                     {name}
                   </MenuItem>
@@ -171,10 +170,10 @@ function TicketDetailAdmin(props) {
             <div className="ticket-preview-info-status-container">
               {ticket.status.toUpperCase()}
             </div>
-            <span className="flex1 span-button" onClick={() => handleSolve()}>
+            <span className="flex1 span-button" onClick={() => handleUpdate("Résolu")}>
               <img src={validate} className="ticket-preview-close-img" alt="validate" width="35" />
             </span>
-            <span className="flex1 span-button" onClick={() => handleDelete()}>
+            <span className="flex1 span-button" onClick={() => handleUpdate("Fermé")}>
               <img src={remove} className="ticket-preview-close-img" alt="delete" width="35" />
             </span>
             <span

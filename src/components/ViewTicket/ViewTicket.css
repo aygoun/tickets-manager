@@ -1,0 +1,17 @@
+.newticket-header-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.viewticket-publicID{
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #F24328;
+}
+.newticket-body-input-container {
+    margin-bottom: 1em;
+}
