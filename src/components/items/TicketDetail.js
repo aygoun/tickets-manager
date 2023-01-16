@@ -18,7 +18,6 @@ function TicketDetail(props) {
   let timeString = dateTmp.toLocaleTimeString();
   const date = dateString + " " + timeString;
   const handleDelete = () => {
-    console.log("HELLO: " + ticket.ticketID);
     const docRef = doc(db, "tickets", "" + ticket.ticketID);
     updateDoc(docRef, { status: "Fermé" });
   };

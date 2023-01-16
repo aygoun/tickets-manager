@@ -70,7 +70,7 @@ function ViewTicket(props) {
   }, [navigate]);
 
   return (
-    <div>
+    <div style={{marginBottom: "2em"}}>
       <Header isLogout={true} />
       {Object.entries(ticket).length !== 0 && (
         <div className="newticket-maincontainer">
