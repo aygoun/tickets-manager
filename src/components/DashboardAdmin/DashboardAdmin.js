@@ -10,11 +10,10 @@ import {
   where,
   getDocs,
   orderBy,
-  onSnapshot,
   startAfter,
   limit,
   doc,
-  getDoc,
+  getDoc
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import users from "../../assets/users.png";
@@ -34,249 +33,41 @@ import DialogTitle from "@mui/material/DialogTitle";
 function DashboardAdmin() {
   let navigate = useNavigate();
 
-  const [userEmail, setUserEmail] = useState(sessionStorage.getItem("userEmail"));
-  const [allUserTickets, setAllUserTickets] = useState([]);
-  const [userTickets, setUserTickets] = useState([]);
-  const [noTickets, setNoTickets] = useState("");
-  const [open, setOpen] = useState([]);
-  const [closed, setClosed] = useState([]);
-  const [affected, setAffected] = useState([]);
-  const [solved, setSolved] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
+  const [allTickets, setAllTickets] = useState([]);
+  const [displayedTickets, setDisplayedTickets] = useState([]);
+  const [noTicketsMsg, setNoTicketsMsg] = useState("");
+  const [open, setOpen] = useState(0);
+  const [closed, setClosed] = useState(0);
+  const [affected, setAffected] = useState(0);
+  const [solved, setSolved] = useState(0);
   const [lastDoc, setLastDoc] = useState(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Tous");
+  const [tag, setTag] = useState("Tous");
   const [csvData, setCsvData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [myAffectation, setMyAffectation] = useState(false);
-  const [tag, setTag] = useState("Tous");
 
-
+  /* CHECK USER PERMISSIONS */
   const getUserPermissions = async () => {
-    const docRef = doc(db, "users", userEmail);
-    const docSnap = await getDoc(docRef);
+      const docRef = doc(db, "users", userEmail);
+      const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      if (docSnap.data().isAdmin === true) {
-        console.log("Existing user");
-      }
-      else {
-        navigate("/dashboard");
-      }
-    } else {
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
-    }
-  };
-
-  const handleCheckbox = (curr) => {
-    setMyAffectation(curr);
-    setTag("Tous");
-    setStatus("Tous");
-    console.log("Checkbox: ", curr);
-    fetchTickets(curr);
-  }
-
-  const filterTickets = (tickets) => {
-    setNoTickets("");
-    setAllUserTickets(tickets);
-    setUserTickets(tickets);
-    setOpen([]);
-    setClosed([]);
-    setAffected([]);
-    setSolved([]);
-    tickets.forEach(element => {
-      switch (element.status) {
-        case "Ouvert":
-          setOpen(open => [...open, element]);
-          break;
-        case "Fermé":
-          setClosed(closed => [...closed, element]);
-          break;
-        case "Affecté":
-          setAffected(affected => [...affected, element]);
-          break;
-        case "Résolu":
-          setSolved(solved => [...solved, element]);
-          break;
-        default:
-          break;
-      }
-    });
-  };
-
-  const handleChange = () => {
-    let next;
-    if (myAffectation)
-    {
-      next = query(collection(db, "tickets"), limit(50), orderBy("date", "desc"), startAfter(lastDoc), where("affectedTo", "array-contains", userEmail));
-    }
-    else {
-      next = query(collection(db, "tickets"), limit(50), orderBy("date", "desc"), startAfter(lastDoc));
-    } 
-    onSnapshot(next, (querySnapshot) => {
-      const tickets = querySnapshot.docs.map((doc) => {
-        return {
-          id: doc.id,
-          ...doc.data(),
-        };
-      });
-      if (tickets.length === 0) {
-        setNoTickets("Aucun autre ticket");
-      } else {
-        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-        setLastDoc(lastVisible);
-        filterTickets(tickets);
-      }
-    }
-    );
-  };
-
-  const fetchTickets = async (status) => {
-    let q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50));
-    
-    onSnapshot(q, (querySnapshot) => {
-      let tickets = querySnapshot.docs.map((doc) => {
-        if (status && doc.data().affectedTo.includes(userEmail)){
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
-        } else if (!status){
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
-        } else {
-          return {
-            id: -1,
-            ...doc.data(),
-          };
-        }
-      });
-      tickets = tickets.filter((ticket) => ticket.id !== -1);
-      if (tickets.length === 0) {
-        setNoTickets("Aucun ticket");
-      } else {
-        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-        setLastDoc(lastVisible);
-        filterTickets(tickets);
-      }
-    });
-  };
-
-  const handleSearchChange = async (value) => {
-    setSearch(value);
-    if (value.length > 3) {
-      let q = query(collection(db, "tickets"), where("object", "==", value), orderBy("date", "desc"));
-      let qUsername = query(collection(db, "tickets"), where("from", "==", value), orderBy("date", "desc"));
-      if (tag !== "Tous") {
-        q = query(collection(db, "tickets"), where("object", "==", value), where("tag", "==", tag), orderBy("date", "desc"));
-        qUsername = query(collection(db, "tickets"), where("from", "==", value), where("tag", "==", tag), orderBy("date", "desc"));
-      }
-
-      const querySnapshot = await getDocs(q);
-      const querySnapshotUsername = await getDocs(qUsername);
-      let tickets = [];
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        tickets.push(doc.data());
-      });
-      querySnapshotUsername.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        //console.log("Doc: " + doc.data());
-        tickets.push(doc.data());
-      });
-      if (value.length === 6){
-        let qID = query(collection(db, "tickets"), where("publicID", "==", value));
-        const querySnapshotID = await getDocs(qID);
-        querySnapshotID.forEach((doc) => {
-          tickets.push(doc.data());
-        }
-        );
-      }
-      setUserTickets(tickets);
-      filterTickets(tickets);
-    }
-    else {
-      if (status === "Tous") {
-        fetchTickets(myAffectation);
-      }
-      else {
-        let q;
-        if (myAffectation) {
-          q = query(collection(db, "tickets"), where("tag", "==", tag), where("affectedTo", "array-contains", userEmail), limit(100), orderBy("date", "desc"));
+      if (docSnap.exists()) {
+        if (docSnap.data().isAdmin === true) {
+          console.log("Existing user");
         }
         else {
-          q = query(collection(db, "tickets"), where("tag", "==", tag), limit(100), orderBy("date", "desc"));
+          navigate("/dashboard");
         }
-        const querySnapshot = await getDocs(q);
-        let tickets = [];
-        querySnapshot.forEach((doc) => {
-          // doc.data() is never undefined for query doc snapshots
-          tickets.push(doc.data());
-        });
-        setUserTickets(tickets);
-        filterTickets(tickets);
-      }
-    }
-  };
-
-  const handleTagChange = async (tagValue) => {
-    setTag(tagValue);
-    if (tagValue === "Tous") {
-      fetchTickets(myAffectation);
-    }
-    else {
-      let q;
-      if (myAffectation) {
-        q = query(collection(db, "tickets"), where("tag", "==", tagValue), where("affectedTo", "array-contains", userEmail), limit(100), orderBy("date", "desc"));
-      }
-      else {
-        q = query(collection(db, "tickets"), where("tag", "==", tagValue), limit(100), orderBy("date", "desc"));
-      }
-      const querySnapshot = await getDocs(q);
-      let tickets = [];
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        tickets.push(doc.data());
-      });
-      setUserTickets(tickets);
-      filterTickets(tickets);
-    }
-  };
-
-
-  useEffect(() => {
-    if (Object.entries(allUserTickets).length === 0 && noTickets === "") {
-      fetchTickets(myAffectation);
-    }
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserEmail(user.email);
-        sessionStorage.setItem("userEmail", user.email);
-        console.log("User is logged in");
-        getUserPermissions();
       } else {
-        signOut(auth).then(() => {
-          // Sign-out successful.
-        }).catch((error) => {
-          // An error happened.
-        });
-        sessionStorage.clear();
-        navigate("/");
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
       }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
-  useEffect(() => {
-      if (search.length === 0 && status === "Tous") {
-        setUserTickets(allUserTickets);
-        filterTickets(allUserTickets);
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search])
-
+  /* GENERATE CSV */
   const handleClickOpen = () => {
     setOpenDialog(true);
   };
@@ -310,6 +101,328 @@ function DashboardAdmin() {
       console.log("TEST");
     });
   };
+
+  /* GET TICKETS */
+  const fetchTickets = async (statusChanged) => {
+    setAllTickets([]);
+    setDisplayedTickets([]);
+    setNoTicketsMsg("");
+    if (!statusChanged) {
+      setOpen(0);
+      setClosed(0);
+      setAffected(0);
+      setSolved(0);
+    }
+    var q;
+    if (myAffectation) {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    else {
+      q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50));
+    }
+    if (tag !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("tag", "==", tag),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    if (status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    if (tag !== "Tous" && status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("tag", "==", tag),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    if (myAffectation && tag !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        where("tag", "==", tag),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    if (myAffectation && status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    if (myAffectation && tag !== "Tous" && status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        where("tag", "==", tag),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50)
+      );
+    }
+    const querySnapshot = await getDocs(q);
+    var ticketsIDs = [];
+    var openNb = 0;
+    var closedNb = 0;
+    var affectedNb = 0;
+    var solvedNb = 0;
+    querySnapshot.forEach((doc) => {
+      ticketsIDs.push(doc.data().ticketID);
+      switch (doc.data().status) {
+        case "Ouvert":
+          openNb = openNb + 1;
+          break;
+        case "Fermé":
+          closedNb = closedNb + 1;
+          break;
+        case "Affecté":
+          affectedNb = affectedNb + 1;
+          break;
+        case "Résolu":
+          solvedNb = solvedNb + 1;
+          break;
+        default:
+          break;
+      }
+    });
+    if (ticketsIDs.length === 0) {
+      setNoTicketsMsg("Aucun ticket ne correspond à ces critères");
+    }
+    else{
+      if (!statusChanged) {
+        setOpen(openNb);
+        setClosed(closedNb);
+        setAffected(affectedNb);
+        setSolved(solvedNb);
+      }
+      setAllTickets(ticketsIDs);
+      setDisplayedTickets(ticketsIDs);
+      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
+    }
+  };
+
+  const fetchMoreTickets = async () => {
+    var q;
+    if (myAffectation === true) {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    else {
+      q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50), startAfter(lastDoc));
+    }
+    if (tag !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("tag", "==", tag),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    if (status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    if (tag !== "Tous" && status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("tag", "==", tag),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    if (myAffectation === true && tag !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        where("tag", "==", tag),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    if (myAffectation === true && status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    if (myAffectation === true && tag !== "Tous" && status !== "Tous") {
+      q = query(
+        collection(db, "tickets"),
+        where("affectedTo", "array-contains", userEmail),
+        where("tag", "==", tag),
+        where("status", "==", status),
+        orderBy("date", "desc"),
+        limit(50),
+        startAfter(lastDoc)
+      );
+    }
+    const querySnapshot = await getDocs(q);
+    var ticketsIDs = [];
+    var openNb = open;
+    var closedNb = closed;
+    var affectedNb = affected;
+    var solvedNb = solved;
+    querySnapshot.forEach((doc) => {
+      ticketsIDs.push(doc.data().ticketID);
+      switch (doc.data().status) {
+        case "Ouvert":
+          openNb = openNb + 1;
+          break;
+        case "Fermé":
+          closedNb = closedNb + 1;
+          break;
+        case "Affecté":
+          affectedNb = affectedNb + 1;
+          break;
+        case "Résolu":
+          solvedNb = solvedNb + 1;
+          break;
+        default:
+          break;
+      }
+    });
+    if (querySnapshot.docs.length === 0) {
+      setNoTicketsMsg("Aucun ticket à afficher");
+    }
+    else {
+      setNoTicketsMsg("");
+      setOpen(openNb);
+      setClosed(closedNb);
+      setAffected(affectedNb);
+      setSolved(solvedNb);
+
+      setAllTickets(allTickets.concat(ticketsIDs));
+      setDisplayedTickets(displayedTickets.concat(ticketsIDs));
+      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleTagChange = (value) => {
+    setTag(value);
+  };
+
+  const handleStatusChange = (value) => {
+    setStatus(value);
+  };
+
+  const handleSearch = () => {
+    if (search === "") {
+      fetchTickets(false);
+    }
+    else {
+      var tickets = [];
+      var q = query(
+        collection(db, "tickets"),
+        where("publicID", "==", search),
+        orderBy("date", "desc")
+      );
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          tickets.push(doc.data().ticketID);
+        });
+      });
+
+      var q2 = query(
+        collection(db, "tickets"),
+        where("from", "==", search),
+        orderBy("date", "desc")
+      );
+      getDocs(q2).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          tickets.push(doc.data().ticketID);
+        });
+        
+        //Remove duplicates
+        var unique = [...new Set(tickets.map((item) => item))];
+        setDisplayedTickets(unique);
+      });
+    }
+  };
+
+  const handleMyAffectation = () => {
+    setMyAffectation(!myAffectation);
+    setTag("Tous");
+    setStatus("Tous");
+    setSearch("");
+  };
+
+  useEffect(() => {
+    fetchTickets(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tag, myAffectation]);
+
+  useEffect(() => {
+    fetchTickets(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserEmail(user.email);
+        sessionStorage.setItem("userEmail", user.email);
+        console.log("User is logged in");
+      } else {
+        signOut(auth).then(() => {
+          // Sign-out successful.
+          getUserPermissions();
+        }).catch((error) => {
+          // An error happened.
+        });
+        console.log("User is logged out");
+        sessionStorage.clear();
+        navigate("/");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userEmail]);
 
 
   return (
@@ -373,7 +486,7 @@ function DashboardAdmin() {
           <div className="dashboard-content-serchbar-container">
             <div className="dashboard-content-title">Tickets :</div>
             <div className="dashboard-content-title">
-              <TextField id="outlined-search" label="ID, résumé ou mail" type="search" value={search} onChange={(e) => handleSearchChange(e.target.value)} />
+              <TextField id="outlined-search" label="ID ou mail" type="search" value={search} onChange={(e) => handleSearchChange(e)} />
             </div>
           </div>
           <div className="dashboard-content-body-subcontainer">
@@ -382,62 +495,57 @@ function DashboardAdmin() {
                 <span
                   onClick={() => 
                     {
-                      setUserTickets(allUserTickets);
-                      setStatus("Tous")
+                      handleStatusChange("Tous");
                     }}
                   className="dashboard-content-body-menu"
                 >
                   <div 
                     className={status === "Tous" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                   >
-                    TOUS ({allUserTickets.length})
+                    TOUS ({open+closed+affected+solved})
                   </div>
                 </span>
                 <span
                   onClick={() => {
-                    setUserTickets(open);
-                    setStatus("Ouvert")
+                    handleStatusChange("Ouvert");
                   }}
                   className="dashboard-content-body-menu"
                 >
                   <div
                     className={status === "Ouvert" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                   >
-                    OUVERT ({open.length})
+                    OUVERT ({open})
                   </div>
                 </span>
                 <span
                   onClick={() =>
                     {
-                      setUserTickets(affected);
-                      setStatus("Affecté")
+                      setStatus("Affecté");
                     }}
                   className="dashboard-content-body-menu"
                 >
                   <div
                     className={status === "Affecté" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                   >
-                    AFFECTÉ ({affected.length})
+                    AFFECTÉ ({affected})
                   </div>
                 </span>
                 <span
                   onClick={() => {
-                    setUserTickets(solved);
-                    setStatus("Résolu")
+                    handleStatusChange("Résolu");
                   }}
                   className="dashboard-content-body-menu"
                 >
                   <div 
                     className={status === "Résolu" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                   >
-                    RÉSOLU ({solved.length})
+                    RÉSOLU ({solved})
                   </div>
                 </span>
                 <span
                   onClick={() => 
                     {
-                      setUserTickets(closed);
-                      setStatus("Fermé")
+                      handleStatusChange("Fermé");
                     }}
                   className="dashboard-content-body-menu"
                 >
@@ -445,7 +553,7 @@ function DashboardAdmin() {
                     className={status === "Fermé" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                     style={{ borderBottom: 0 }}
                   >
-                    FERMÉ ({closed.length})
+                    FERMÉ ({closed})
                   </div>
                 </span>
               </div>
@@ -472,21 +580,25 @@ function DashboardAdmin() {
                 </FormControl>
               </div>
 
-              <div>
-                <input type="checkbox" id="myCheck" onClick={() => handleCheckbox(!myAffectation)} />
-                <label for="myCheck">Afficher mes affectations</label>
+              
+              <div className="dashboard-filter-affectation-container">
+                <p className="dashboard-switch-text">Afficher mes affectations</p>
+                <label for="myCheck" className="switch">
+                  <input type="checkbox" id="myCheck" onClick={() => handleMyAffectation(!myAffectation)} />
+                  <span class="slider round"></span>
+                </label>
               </div>
             </div>
 
             <div className="dashboard-content-body-content-container">
               <div className="flex1 dashboard-content-body-content-subcontainer">
-                {userTickets &&
-                  userTickets.map((ticket, key) => {
-                    return <TicketDetailAdmin ticket={ticket} key={ticket.ticketID} isAdmin={true} />;
+                {displayedTickets &&
+                  displayedTickets.map((ticket, index) => {
+                    return <TicketDetailAdmin ticketID={ticket} key={index} isAdmin={true} />;
                   })}
-                {<h3 align="center">{noTickets}</h3>}
+                {<h3 align="center">{noTicketsMsg}</h3>}
               </div>
-              <div className="flex1"><Button onClick={handleChange} variant="outlined">Charger</Button></div>
+              <div className="flex1"><Button onClick={() => fetchMoreTickets()} variant="outlined">Charger</Button></div>
             </div>
           </div>
         </div>
