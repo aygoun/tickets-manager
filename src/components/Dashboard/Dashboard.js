@@ -1,4 +1,4 @@
-import "./Dashboard.css";
+﻿import "./Dashboard.css";
 import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import { auth, db } from "../../firebase";
@@ -149,7 +149,7 @@ function Dashboard() {
       <div className="dashboard-container">
         <div className="dashboard-header-content">
           <div className="dashboard-content-header-title">
-            👋 Bonjour {userEmail} !
+            Bonjour {userEmail} !
           </div>
           <span 
           className="pointer-cursor" onClick={handleNewTicket}>
