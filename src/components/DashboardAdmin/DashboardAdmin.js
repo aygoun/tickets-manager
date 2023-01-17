@@ -114,6 +114,9 @@ function DashboardAdmin() {
     if (mailToDelete === "") {
       alert("Veuillez saisir un mail");
     }
+    else if (mailToDelete === "ticketmanager@festival-aix.com") {
+	alert("Vous ne pouvez pas supprimer le super-utilisateur...");
+    }
     else {
       //Alert to confirm deletion
       if (window.confirm("Voulez-vous vraiment supprimer cet utilisateur : " + mailToDelete + " ?")) {
