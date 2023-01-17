@@ -55,7 +55,7 @@ function Login() {
         })
         .catch((error) => {
           const errorMessage = error.message;
-          alert("An error occured: " + errorMessage);
+          alert("Connexion échouée, veuillez réessayer: " + errorMessage);
         });
     }
   };
@@ -70,7 +70,7 @@ function Login() {
       })
       .catch((error) => {
         const errorMessage = error.message;
-        alert("Error: " + errorMessage);
+        alert("Une erreur est survenue: " + errorMessage);
       });
   };
   return (

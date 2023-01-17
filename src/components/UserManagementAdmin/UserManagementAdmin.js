@@ -23,7 +23,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 function UserManagementAdmin() {
   let navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(null);
   const [userMail, setUserMail] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -66,7 +66,7 @@ function UserManagementAdmin() {
   };
 
   useEffect(() => {
-    if (Object.entries(users).length === 0) {
+    if (users === null) {
       getUsers();
     }
     auth.onAuthStateChanged((user) => {
@@ -90,7 +90,7 @@ function UserManagementAdmin() {
       <div className="user-management-admin-container">
         <h2>Vos admins :</h2>
         <div className="user-management-admin-sub-container">
-          {users.map((user, index) => {
+          {users && users.map((user, index) => {
             return (
               <div style={{ width: "100%" }} key={index}>
                 <div className="user-management-admin-items">

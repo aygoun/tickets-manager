@@ -90,10 +90,22 @@
     justify-content: flex-end!important;
     align-items: center;
 }
+@media screen and (max-width: 768px) {
+    .dashboard-content-body-subcontainer{
+        display: inline-block!important;
+    }
+    .ticket-preview-info-container{
+        flex-wrap: wrap;
+    }
+    .ticket-preview-info-status-maincontainer{
+        margin-top: 1rem;
+    }
+}
 .ticket-preview-info-status-maincontainer{
     flex-grow: 1!important;
     display: flex;
     flex-direction: row;
+    flex-wrap: no-wrap;
     align-items: center;
 }
 .ticket-preview-info-img{
