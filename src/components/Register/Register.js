@@ -69,6 +69,7 @@ function Register() {
             nbTickets: 0,
             email: email,
             uid: user.uid,
+            isAdmin: false,
           });
           navigate("/dashboard");
         })

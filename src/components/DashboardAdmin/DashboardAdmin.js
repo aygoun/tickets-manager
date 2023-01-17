@@ -13,10 +13,11 @@ import {
   startAfter,
   limit,
   doc,
-  getDoc
+  getDoc,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import users from "../../assets/users.png";
+import del_user from "../../assets/del_user.png";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import InputLabel from '@mui/material/InputLabel';
@@ -24,7 +25,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import { CSVLink } from "react-csv";
-import Dialog  from "@mui/material/Dialog";
+import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -47,24 +48,26 @@ function DashboardAdmin() {
   const [tag, setTag] = useState("Tous");
   const [csvData, setCsvData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog2, setOpenDialog2] = useState(false);
+  const [mailToDelete, setMailToDelete] = useState("");
   const [myAffectation, setMyAffectation] = useState(false);
 
   /* CHECK USER PERMISSIONS */
   const getUserPermissions = async () => {
-      const docRef = doc(db, "users", userEmail);
-      const docSnap = await getDoc(docRef);
+    const docRef = doc(db, "users", userEmail);
+    const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        if (docSnap.data().isAdmin === true) {
-          console.log("Existing user");
-        }
-        else {
-          navigate("/dashboard");
-        }
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
+    if (docSnap.exists()) {
+      if (docSnap.data().isAdmin === true) {
+        console.log("Existing user");
       }
+      else {
+        navigate("/dashboard");
+      }
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
   };
 
   /* GENERATE CSV */
@@ -77,7 +80,7 @@ function DashboardAdmin() {
 
   const headers = [
     { label: "Expéditeur", key: "from" },
-    { label: "Public ID", key: "publicID"},
+    { label: "Public ID", key: "publicID" },
     { label: "Tag", key: "tag" },
     { label: "Résumé", key: "object" },
     { label: "Détails", key: "body" },
@@ -100,6 +103,48 @@ function DashboardAdmin() {
       setCsvData(tickets);
       console.log("TEST");
     });
+  };
+
+  /* DELETE AN USER */
+  const handleClose2 = () => {
+    setOpenDialog2(false);
+  };
+
+  const handleDeleteUserData = async () => {
+    if (mailToDelete === "") {
+      alert("Veuillez saisir un mail");
+    }
+    else {
+      //Alert to confirm deletion
+      if (window.confirm("Voulez-vous vraiment supprimer cet utilisateur : " + mailToDelete + " ?")) {
+        //GET UID OF THE USER TO DELETE
+        const q = doc(db, "users", mailToDelete);
+        await getDoc(q).then((doc) => {
+          if (doc.exists()) {
+            //DELETE USER FROM AUTH
+            console.log(doc.data().uid);
+            fetch("http://192.168.11.245:8080/delete/:" + doc.data().uid+"/:"+mailToDelete)
+              .then((data) => {
+                console.log(data);
+                if (data.statusText === "OK") {
+                  console.log("User deleted from auth");
+                    alert("L'utilisateur ("+ mailToDelete +") et ses données ont été supprimé")
+                    window.location.reload();
+                    handleClose2();
+                } else {
+                  alert("Erreur lors de la suppression de l'utilisateur :" + data.statusText);
+                }
+              });
+          } else {
+            alert("Utilisateur introuvable");
+          }
+        })
+      }
+    }
+  };
+
+  const handleMailChange = (e) => {
+    setMailToDelete(e.target.value);
   };
 
   /* GET TICKETS */
@@ -206,7 +251,7 @@ function DashboardAdmin() {
     if (ticketsIDs.length === 0) {
       setNoTicketsMsg("Aucun ticket ne correspond à ces critères");
     }
-    else{
+    else {
       if (!statusChanged) {
         setOpen(openNb);
         setClosed(closedNb);
@@ -373,7 +418,7 @@ function DashboardAdmin() {
         querySnapshot.forEach((doc) => {
           tickets.push(doc.data().ticketID);
         });
-        
+
         //Remove duplicates
         var unique = [...new Set(tickets.map((item) => item))];
         setDisplayedTickets(unique);
@@ -409,10 +454,10 @@ function DashboardAdmin() {
         setUserEmail(user.email);
         sessionStorage.setItem("userEmail", user.email);
         console.log("User is logged in");
+        getUserPermissions();
       } else {
         signOut(auth).then(() => {
           // Sign-out successful.
-          getUserPermissions();
         }).catch((error) => {
           // An error happened.
         });
@@ -437,17 +482,57 @@ function DashboardAdmin() {
           </div>
           <div className="dashboard-admin-actions-container">
             {userEmail === "ticketmanager@festival-aix.com"
-              ? <span
-                className="pointer-cursor flex1"
-                onClick={() => navigate("/users-management")}
-                style={{ marginRight: 25 }}
-              >
-                <img
-                  src={users}
-                  className="dashboard-content-header-newTicketButton"
-                  alt="users"
-                />
-              </span>
+              ? (
+                <>
+                  <span
+                    className="pointer-cursor flex1"
+                    onClick={() => setOpenDialog2(true)}
+                    style={{ marginRight: 25 }}
+                  >
+                    <img
+                      src={del_user}
+                      className="dashboard-content-header-newTicketButton"
+                      alt="users"
+                    />
+                  </span>
+                  <Dialog open={openDialog2} onClose={handleClose2}>
+                    <DialogTitle>Veuillez rentrer le mail de l'utilisateur à supprimer</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Cette action est irréversible !
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="name"
+                          label="Mail"
+                          type="email"
+                          fullWidth
+                          onChange={handleMailChange}
+                        />
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleClose2} color="primary">
+                        Annuler
+                      </Button>
+                      <Button onClick={handleDeleteUserData} color="warning">
+                        Supprimer
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+
+                  <span
+                    className="pointer-cursor flex1"
+                    onClick={() => navigate("/users-management")}
+                    style={{ marginRight: 25 }}
+                  >
+                    <img
+                      src={users}
+                      className="dashboard-content-header-newTicketButton"
+                      alt="users"
+                    />
+                  </span>
+                </>)
               : ""}
             <span
               className="pointer-cursor flex1"
@@ -493,16 +578,15 @@ function DashboardAdmin() {
             <div className="dashboard-content-body-filtermenu-main">
               <div className="dashboard-content-body-filtermenu">
                 <span
-                  onClick={() => 
-                    {
-                      handleStatusChange("Tous");
-                    }}
+                  onClick={() => {
+                    handleStatusChange("Tous");
+                  }}
                   className="dashboard-content-body-menu"
                 >
-                  <div 
+                  <div
                     className={status === "Tous" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                   >
-                    TOUS ({open+closed+affected+solved})
+                    TOUS ({open + closed + affected + solved})
                   </div>
                 </span>
                 <span
@@ -518,10 +602,9 @@ function DashboardAdmin() {
                   </div>
                 </span>
                 <span
-                  onClick={() =>
-                    {
-                      setStatus("Affecté");
-                    }}
+                  onClick={() => {
+                    setStatus("Affecté");
+                  }}
                   className="dashboard-content-body-menu"
                 >
                   <div
@@ -536,20 +619,19 @@ function DashboardAdmin() {
                   }}
                   className="dashboard-content-body-menu"
                 >
-                  <div 
+                  <div
                     className={status === "Résolu" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                   >
                     RÉSOLU ({solved})
                   </div>
                 </span>
                 <span
-                  onClick={() => 
-                    {
-                      handleStatusChange("Fermé");
-                    }}
+                  onClick={() => {
+                    handleStatusChange("Fermé");
+                  }}
                   className="dashboard-content-body-menu"
                 >
-                  <div 
+                  <div
                     className={status === "Fermé" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
                     style={{ borderBottom: 0 }}
                   >
@@ -580,7 +662,7 @@ function DashboardAdmin() {
                 </FormControl>
               </div>
 
-              
+
               <div className="dashboard-filter-affectation-container">
                 <p className="dashboard-switch-text">Afficher mes affectations</p>
                 <label for="myCheck" className="switch">
