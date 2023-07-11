@@ -27,23 +27,38 @@
     background-color: #000 !important;
     color: #fff;
     font-weight: 700;
+    transition: all 0.3s ease-in-out;
 }
 .login-form-validate-text:hover {
     background-color: #fff !important;
     color: #000;
     font-weight: 700;
+    transition: all 0.3s ease-in-out;
 }
 .login-form-validate-a{
     text-decoration: none;
     color: #000;
     font-weight: 500;
 }
+.forget-password-container {
+    text-decoration: none;
+    color: #414141;
+    font-size: 0.9rem;
+    font-style: italic;
+    font-weight: 500;
+    text-align: center;
+}
 .login-first-connection-button{
     width: 100%;
     margin-top: 1rem!important;
     color: #000 !important;
     border: 1px solid #000 !important;
+    font-weight: 500!important;
 }
 .cursor-pointer{
     cursor: pointer;
+}
+.register-icon {
+    width: 15px;
+    height: 15px;
 }

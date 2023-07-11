@@ -11,6 +11,7 @@ import ViewTicket from './components/ViewTicket/ViewTicket';
 import Register from './components/Register/Register';
 import DashboardAdmin from './components/DashboardAdmin/DashboardAdmin';
 import UserManagementAdmin from './components/UserManagementAdmin/UserManagementAdmin';
+import CheckEmail from './components/CheckEmail/CheckEmail';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/view-ticket:id:admin" element={<ViewTicket />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/check-email/:email" element={<CheckEmail />} />
           <Route path="/new-ticket" element={<NewTicket />} />
           {/*ADMIN ROUTES*/}
           <Route path="/admin" element={<DashboardAdmin />}/>

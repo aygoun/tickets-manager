@@ -2,34 +2,17 @@ import "./Register.css";
 import React, { useState } from "react";
 import Header from "../items/Header";
 import { db } from "../../firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Footer from "../items/Footer";
-import Axios from "axios";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
 function Register() {
   let navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [open, setOpen] = useState(false);
-  const [verifiedPassword, setVerifiedPassword] = useState("");
-  const [tmpPassword, setTmpPassword] = useState("");
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleSubmit = async (e) => {
     const emailSplited = email.split("@");
@@ -42,45 +25,50 @@ function Register() {
       alert("Veuillez remplir tous les champs");
     } else {
       //send api request
-      const response = await Axios('http://192.168.11.245:8080/mail:' + email);
-      if (response.data === "KO") {
-        alert("Une erreur est survenue, veuillez réessayer");
-      }
-      else {
-        setVerifiedPassword(response.data);
-        handleClickOpen();
-      }
-      console.log("Sending request");
+      // const response = await Axios('http://192.168.11.245:8080/mail:' + email);
+      // if (response.data === "KO") {
+      //   alert("Une erreur est survenue, veuillez réessayer");
+      // }
+      // else {
+      //   setVerifiedPassword(response.data);
+      //   handleClickOpen();
+      // }
+      // console.log("Sending request");
+      handleAccountCreation();
     }
   };
 
   const handleAccountCreation = () => {
-    if (verifiedPassword === tmpPassword) {
-      const auth = getAuth();
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed in user
-          const user = userCredential.user;
-          sessionStorage.setItem("userUID", user.uid);
-          sessionStorage.setItem("userEmail", email);
-          // Create user profile
-          const userRef = doc(db, "users", email);
-          setDoc(userRef, {
-            nbTickets: 0,
-            email: email,
-            uid: user.uid,
-            isAdmin: false,
-          });
-          navigate("/dashboard");
-        })
-        .catch((error) => {
-          const errorMessage = error.message;
-          alert("Erreur: " + errorMessage);
+    const auth = getAuth();
+    auth.languageCode = 'fr';
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in user
+        const user = userCredential.user;
+        sessionStorage.setItem("userUID", user.uid);
+        sessionStorage.setItem("userEmail", email);
+        // Create user profile
+        const userRef = doc(db, "users", email);
+        setDoc(userRef, {
+          nbTickets: 0,
+          email: email,
+          uid: user.uid,
+          isAdmin: false,
         });
-    }
-    else {
-      alert("Le mot de passe ne correspond pas");
-    }
+        sendEmailVerification(user)
+          .then(() => {
+            // Email verification sent!
+            navigate("/check-email/"+ email);
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            alert("Erreur: " + errorMessage);
+          });
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        alert("Erreur: " + errorMessage);
+      });
   };
 
   return (
@@ -99,15 +87,26 @@ function Register() {
                 className="login-form-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    document.getElementById("password").focus();
+                  }
+                }}
               />
             </div>
             <div className="login-form-body-input">
               <input
                 type="password"
+                id="password"
                 placeholder="Mot de passe"
                 className="login-form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSubmit();
+                  }
+                }}
               />
             </div>
             <div className="login-form-button-container">
@@ -117,29 +116,6 @@ function Register() {
               >
                 <div className="login-form-validate-text">Valider</div>
               </span>
-              <Dialog open={open} onClose={handleClose}>
-                  <DialogTitle>Entrer le code à 4 chiffres envoyé à : {email}</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      Vous avez reçu un mail pour vérifier votre compte. <br/>Le délai d'envoi est de d'environ 1 minute.
-                    </DialogContentText>
-                    <TextField
-                      autoFocus
-                      margin="dense"
-                      id="name"
-                      label="0000"
-                      type="text"
-                      fullWidth
-                      variant="standard"
-                      value={tmpPassword}
-                      onChange={(e) => setTmpPassword(e.target.value)}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose}>Annuler</Button>
-                    <Button onClick={() => handleAccountCreation()}>Valider</Button>
-                  </DialogActions>
-                </Dialog>
             </div>
             <Button
               variant="outlined"

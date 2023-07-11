@@ -16,6 +16,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Footer from "../items/Footer";
+import ChevronIcon from "../../assets/chevron-right.png";
 
 function Login() {
   let navigate = useNavigate();
@@ -48,10 +49,15 @@ function Login() {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          sessionStorage.setItem("userUID", user.uid);
-          sessionStorage.setItem("userEmail", email);
-          navigate("/dashboard");
-          console.log("USER SIGN IN AS: " + email);
+          if (!user.emailVerified) {
+            alert("Vous n'avez pas confirmer votre adresse mail.\nUn mail vous a été envoyé.");
+            return;
+          } else {
+            sessionStorage.setItem("userUID", user.uid);
+            sessionStorage.setItem("userEmail", email);
+            navigate("/dashboard");
+            console.log("USER SIGN IN AS: " + email);
+          }
         })
         .catch((error) => {
           const errorMessage = error.message;
@@ -89,6 +95,12 @@ function Login() {
                 className="login-form-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
+                // When enter is pressed go to password
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    document.getElementById("password").focus();
+                  }
+                }}
               />
             </div>
             <div className="login-form-body-input">
@@ -98,6 +110,13 @@ function Login() {
                 className="login-form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                id="password"
+                // When enter is pressed submit
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSubmit();
+                  }
+                }}
               />
             </div>
             <div className="login-form-button-container">
@@ -108,9 +127,9 @@ function Login() {
                 <div className="login-form-validate-text">Valider</div>
               </span>
             </div>
-            <div>
+            <div className="forget-password-container">
               <span
-                className="login-form-first-connexion-a login-form-validate-a pointer-cusor"
+                className="login-form-first-connexion-a login-form-validate-a cursor-pointer forget-password-container"
                 onClick={handleClickOpen}
               >
                 Mot de passe oublié ?
@@ -145,7 +164,8 @@ function Login() {
                 onClick={() => navigate("/register")}
                 className="login-first-connection-button"
               >
-                Première connexion ?
+                Première connexion 
+                <img src={ChevronIcon} alt="arrow" className="register-icon"/>
               </Button>
             </div>
           </div>
