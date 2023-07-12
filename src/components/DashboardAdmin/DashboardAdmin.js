@@ -1,4 +1,3 @@
-﻿import "./DashboardAdmin.css";
 import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import { db, auth } from "../../firebase";
@@ -15,6 +14,7 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
+import "./DashboardAdmin.css";
 import { signOut } from "firebase/auth";
 import users from "../../assets/users.png";
 import del_user from "../../assets/del_user.png";
@@ -115,7 +115,7 @@ function DashboardAdmin() {
       alert("Veuillez saisir un mail");
     }
     else if (mailToDelete === "ticketmanager@festival-aix.com") {
-	alert("Vous ne pouvez pas supprimer le super-utilisateur...");
+	    alert("Vous ne pouvez pas supprimer le super-utilisateur...");
     }
     else {
       //Alert to confirm deletion
@@ -479,73 +479,83 @@ function DashboardAdmin() {
       <div className="dashboard-container">
         <div className="dashboard-header-content">
           <div className="dashboard-content-header-title">
-            <span style={{ color: 'red' }}>MODE ADMIN</span>
+            <span style={{ color: "red" }}>MODE ADMIN</span>
             <br />
             Connecté en {userEmail} !
           </div>
           <div className="dashboard-admin-actions-container">
-            {userEmail === "ticketmanager@festival-aix.com"
-              ? (
-                <>
-                  <span
-                    className="pointer-cursor flex1"
-                    onClick={() => setOpenDialog2(true)}
-                    style={{ marginRight: 25 }}
-                  >
-                    <img
-                      src={del_user}
-                      className="dashboard-content-header-newTicketButton"
-                      alt="users"
-                    />
-                  </span>
-                  <Dialog open={openDialog2} onClose={handleClose2}>
-                    <DialogTitle>Veuillez rentrer le mail de l'utilisateur à supprimer</DialogTitle>
-                    <DialogContent>
-                      <DialogContentText>
-                        Cette action est irréversible !
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          id="name"
-                          label="Mail"
-                          type="email"
-                          fullWidth
-                          onChange={handleMailChange}
-                        />
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={handleClose2} color="primary">
-                        Annuler
-                      </Button>
-                      <Button onClick={handleDeleteUserData} color="warning">
-                        Supprimer
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+            {userEmail === "ticketmanager@festival-aix.com" ? (
+              <>
+                <span
+                  className="pointer-cursor flex1"
+                  onClick={() => setOpenDialog2(true)}
+                  style={{ marginRight: 25 }}
+                >
+                  <img
+                    src={del_user}
+                    className="dashboard-content-header-newTicketButton"
+                    alt="users"
+                  />
+                </span>
+                <Dialog open={openDialog2} onClose={handleClose2}>
+                  <DialogTitle>
+                    Veuillez rentrer le mail de l'utilisateur à supprimer
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Cette action est irréversible !
+                      <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="Mail"
+                        type="email"
+                        fullWidth
+                        onChange={handleMailChange}
+                      />
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose2} color="primary">
+                      Annuler
+                    </Button>
+                    <Button onClick={handleDeleteUserData} color="warning">
+                      Supprimer
+                    </Button>
+                  </DialogActions>
+                </Dialog>
 
-                  <span
-                    className="pointer-cursor flex1"
-                    onClick={() => navigate("/users-management")}
-                    style={{ marginRight: 25 }}
-                  >
-                    <img
-                      src={users}
-                      className="dashboard-content-header-newTicketButton"
-                      alt="users"
-                    />
-                  </span>
-                </>)
-              : ""}
-            <span
-              className="pointer-cursor flex1"
-            >
-              <Button variant="contained" onClick={handleExport}>Exporter</Button>
+                <span
+                  className="pointer-cursor flex1"
+                  onClick={() => navigate("/users-management")}
+                  style={{ marginRight: 25 }}
+                >
+                  <img
+                    src={users}
+                    className="dashboard-content-header-newTicketButton"
+                    alt="users"
+                  />
+                </span>
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+        </div>
+        <div className="dashboard-content-body">
+          <div className="dashboard-content-searchbar-container">
+            <span className="pointer-cursor flex1">
+              <Button variant="contained" onClick={handleExport}>
+                Exporter
+              </Button>
               <Dialog open={openDialog} onClose={handleClose}>
-                <DialogTitle>Veuillez attendre le téléchargement des données</DialogTitle>
+                <DialogTitle>
+                  Veuillez attendre le téléchargement des données
+                </DialogTitle>
                 <DialogContent>
                   <DialogContentText>
-                    Le bouton "télécharger" sera disponible à la fin du téléchargement.
+                    Le bouton "télécharger" sera disponible à la fin du
+                    téléchargement.
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -557,24 +567,22 @@ function DashboardAdmin() {
                     filename={"tickets.csv"}
                     style={{ marginLeft: "1rem" }}
                   >
-                    <Button
-                      variant="contained"
-                      onclick={handleClose}
-                    >
+                    <Button variant="contained" onclick={handleClose}>
                       {csvData.length > 0 ? "Télécharger" : "Chargement..."}
                     </Button>
                   </CSVLink>
                 </DialogActions>
               </Dialog>
-
             </span>
-          </div>
-        </div>
-        <div className="dashboard-content-body">
-          <div className="dashboard-content-serchbar-container">
-            <div className="dashboard-content-title">Tickets :</div>
             <div className="dashboard-content-title">
-              <TextField id="outlined-search" label="ID ou mail" type="search" value={search} onChange={(e) => handleSearchChange(e)} />
+              <TextField
+                id="outlined-search"
+                className="search-bar-textfield"
+                label="ID ou mail"
+                type="search"
+                value={search}
+                onChange={(e) => handleSearchChange(e)}
+              />
             </div>
           </div>
           <div className="dashboard-content-body-subcontainer">
@@ -587,9 +595,22 @@ function DashboardAdmin() {
                   className="dashboard-content-body-menu"
                 >
                   <div
-                    className={status === "Tous" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    className={
+                      status === "Tous"
+                        ? "dashboard-content-filter-choices active"
+                        : "dashboard-content-filter-choices"
+                    }
                   >
-                    TOUS ({open + closed + affected + solved})
+                    <span className="left-part-title">TOUS</span>
+                    <span
+                      className={
+                        status === "Tous"
+                          ? "right-part-number color-white"
+                          : "right-part-number"
+                      }
+                    >
+                      ({open + closed + affected + solved})
+                    </span>
                   </div>
                 </span>
                 <span
@@ -599,9 +620,22 @@ function DashboardAdmin() {
                   className="dashboard-content-body-menu"
                 >
                   <div
-                    className={status === "Ouvert" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    className={
+                      status === "Ouvert"
+                        ? "dashboard-content-filter-choices active"
+                        : "dashboard-content-filter-choices"
+                    }
                   >
-                    OUVERT ({open})
+                    <span className="left-part-title">OUVERT</span>
+                    <span
+                      className={
+                        status === "Ouvert"
+                          ? "right-part-number color-white"
+                          : "right-part-number"
+                      }
+                    >
+                      ({open})
+                    </span>
                   </div>
                 </span>
                 <span
@@ -611,9 +645,22 @@ function DashboardAdmin() {
                   className="dashboard-content-body-menu"
                 >
                   <div
-                    className={status === "Affecté" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    className={
+                      status === "Affecté"
+                        ? "dashboard-content-filter-choices active"
+                        : "dashboard-content-filter-choices"
+                    }
                   >
-                    AFFECTÉ ({affected})
+                    <span className="left-part-title">AFFECTÉ</span>
+                    <span
+                      className={
+                        status === "Affecté"
+                          ? "right-part-number color-white"
+                          : "right-part-number"
+                      }
+                    >
+                      ({affected})
+                    </span>
                   </div>
                 </span>
                 <span
@@ -623,9 +670,22 @@ function DashboardAdmin() {
                   className="dashboard-content-body-menu"
                 >
                   <div
-                    className={status === "Résolu" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    className={
+                      status === "Résolu"
+                        ? "dashboard-content-filter-choices active"
+                        : "dashboard-content-filter-choices"
+                    }
                   >
-                    RÉSOLU ({solved})
+                    <span className="left-part-title">RÉSOLU</span>
+                    <span
+                      className={
+                        status === "Résolu"
+                          ? "right-part-number color-white"
+                          : "right-part-number"
+                      }
+                    >
+                      ({solved})
+                    </span>
                   </div>
                 </span>
                 <span
@@ -635,10 +695,23 @@ function DashboardAdmin() {
                   className="dashboard-content-body-menu"
                 >
                   <div
-                    className={status === "Fermé" ? "dashboard-content-filter-choices active" : "dashboard-content-filter-choices"}
+                    className={
+                      status === "Fermé"
+                        ? "dashboard-content-filter-choices active"
+                        : "dashboard-content-filter-choices"
+                    }
                     style={{ borderBottom: 0 }}
                   >
-                    FERMÉ ({closed})
+                    <span className="left-part-title">FERMÉ </span>
+                    <span
+                      className={
+                        status === "Fermé"
+                          ? "right-part-number color-white"
+                          : "right-part-number"
+                      }
+                    >
+                      ({closed})
+                    </span>
                   </div>
                 </span>
               </div>
@@ -665,11 +738,16 @@ function DashboardAdmin() {
                 </FormControl>
               </div>
 
-
               <div className="dashboard-filter-affectation-container">
-                <p className="dashboard-switch-text">Afficher mes affectations</p>
+                <p className="dashboard-switch-text">
+                  Afficher mes affectations
+                </p>
                 <label for="myCheck" className="switch">
-                  <input type="checkbox" id="myCheck" onClick={() => handleMyAffectation(!myAffectation)} />
+                  <input
+                    type="checkbox"
+                    id="myCheck"
+                    onClick={() => handleMyAffectation(!myAffectation)}
+                  />
                   <span class="slider round"></span>
                 </label>
               </div>
@@ -679,16 +757,26 @@ function DashboardAdmin() {
               <div className="flex1 dashboard-content-body-content-subcontainer">
                 {displayedTickets &&
                   displayedTickets.map((ticket, index) => {
-                    return <TicketDetailAdmin ticketID={ticket} key={index} isAdmin={true} />;
+                    return (
+                      <TicketDetailAdmin
+                        ticketID={ticket}
+                        key={index}
+                        isAdmin={true}
+                      />
+                    );
                   })}
                 {<h3 align="center">{noTicketsMsg}</h3>}
               </div>
-              <div className="flex1"><Button onClick={() => fetchMoreTickets()} variant="outlined">Charger</Button></div>
+              <div className="flex1">
+                <Button onClick={() => fetchMoreTickets()} variant="outlined">
+                  Charger
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
 
