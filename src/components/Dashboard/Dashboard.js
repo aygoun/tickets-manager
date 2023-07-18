@@ -1,7 +1,6 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../items/Header";
 import { auth, db } from "../../firebase";
-import plus from "../../assets/plus.png";
 import TicketDetail from "../items/TicketDetail";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,6 +15,7 @@ import {
 import { signOut } from "firebase/auth";
 import Button from "@mui/material/Button";
 import "./Dashboard.css";
+import plusBlack from "../../assets/plus.png"
 
 function Dashboard() {
   let navigate = useNavigate();
@@ -159,20 +159,20 @@ function Dashboard() {
     <div>
       <Header isLogout={true} />
       <div className="dashboard-container">
-        <div className="dashboard-header-content">
-          <div className="dashboard-content-header-title">
-            Bonjour {userEmail} !
-          </div>
-          <span className="pointer-cursor" onClick={handleNewTicket}>
+        <div className="dashboard-content">
+          <div
+            className="dashboard-header-content"
+            onClick={handleNewTicket}
+          >
             <img
-              src={plus}
-              alt="plus"
               className="dashboard-content-header-newTicketButton"
+              src={plusBlack}
+              alt="New ticket"
             />
-          </span>
+            <span className="new-ticketButton">New ticket</span>
+          </div>
         </div>
         <div className="dashboard-content-body">
-          <div className="dashboard-content-title">Mes tickets :</div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu">
               <span

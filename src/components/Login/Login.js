@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   getAuth,
   sendPasswordResetEmail,
+  sendEmailVerification,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -49,9 +50,15 @@ function Login() {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
+          user.reload();
+          auth.languageCode = "fr";
           if (!user.emailVerified) {
-            alert("Vous n'avez pas confirmer votre adresse mail.\nUn mail vous a été envoyé.");
-            return;
+            sendEmailVerification(auth.currentUser).then(() => {
+              alert(
+                "Vous n'avez pas confirmé votre adresse mail.\nUn mail vous a été envoyé."
+              );
+              return;
+            });
           } else {
             sessionStorage.setItem("userUID", user.uid);
             sessionStorage.setItem("userEmail", email);

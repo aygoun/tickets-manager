@@ -30,6 +30,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import axios from "axios";
 
 function DashboardAdmin() {
   let navigate = useNavigate();
@@ -60,6 +61,7 @@ function DashboardAdmin() {
     if (docSnap.exists()) {
       if (docSnap.data().isAdmin === true) {
         console.log("Existing user");
+        fetchFirstTimeTickets();
       }
       else {
         navigate("/dashboard");
@@ -151,6 +153,47 @@ function DashboardAdmin() {
   };
 
   /* GET TICKETS */
+
+  const fetchFirstTimeTickets = async () => {
+    setAllTickets([]);
+    setDisplayedTickets([]);
+    setNoTicketsMsg("");
+    setOpen(0);
+    setClosed(0);
+    setAffected(0);
+    setSolved(0);
+    var q = query(collection(db, "tickets"), orderBy("date", "desc"), limit(50));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.docs.length === 0) {
+      setNoTicketsMsg("Aucun ticket trouvé");
+      return;
+    }
+    var ticketsIDs = [];
+    axios
+      .get("http://192.168.11.245:8080/count", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        setOpen(response.data.open);
+        setClosed(response.data.closed);
+        setAffected(response.data.affected);
+        setSolved(response.data.solved);
+      })
+      .catch((error) => {
+        console.log(error);
+      }); 
+    querySnapshot.forEach((doc) => {
+      ticketsIDs.push(doc.data().ticketID);
+    });
+    setAllTickets(ticketsIDs);
+    setDisplayedTickets(ticketsIDs);
+    setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
+  };
+
   const fetchTickets = async (statusChanged) => {
     setAllTickets([]);
     setDisplayedTickets([]);
@@ -439,7 +482,16 @@ function DashboardAdmin() {
   useEffect(() => {
     fetchTickets(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tag, myAffectation]);
+  }, [tag]);
+
+  useEffect(() => {
+    if (!myAffectation) {
+      fetchFirstTimeTickets();
+    } else {
+      fetchTickets(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myAffectation]);
 
   useEffect(() => {
     fetchTickets(true);
@@ -476,12 +528,10 @@ function DashboardAdmin() {
   return (
     <div>
       <Header isLogout={true} />
-      <div className="dashboard-container">
-        <div className="dashboard-header-content">
+      <div className="dashboard-admin-container">
+        <div className="dashboard-admin-header-content">
           <div className="dashboard-content-header-title">
-            <span style={{ color: "red" }}>MODE ADMIN</span>
-            <br />
-            Connecté en {userEmail} !
+           MODE ADMINISTRATEUR
           </div>
           <div className="dashboard-admin-actions-container">
             {userEmail === "ticketmanager@festival-aix.com" ? (
@@ -493,7 +543,7 @@ function DashboardAdmin() {
                 >
                   <img
                     src={del_user}
-                    className="dashboard-content-header-newTicketButton"
+                    className="dashboard-admin-content-header-newTicketButton"
                     alt="users"
                   />
                 </span>
@@ -542,7 +592,7 @@ function DashboardAdmin() {
             )}
           </div>
         </div>
-        <div className="dashboard-content-body">
+        <div>
           <div className="dashboard-content-searchbar-container">
             <span className="pointer-cursor flex1">
               <Button variant="contained" onClick={handleExport}>
@@ -583,7 +633,7 @@ function DashboardAdmin() {
                 value={search}
                 onChange={(e) => handleSearchChange(e)}
               />
-            </div>
+            </div> 
           </div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu-main">

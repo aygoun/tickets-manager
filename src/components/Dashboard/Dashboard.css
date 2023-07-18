@@ -4,11 +4,35 @@
     margin-right: 5%;
     margin-bottom: 1rem;
 }
+
+.dashboard-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
 .dashboard-header-content{
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
+    padding: 5px 10px;
+    background-color: rgba(242, 67, 40, 0.1);
+    border-radius: 10px;
+    border: 2px solid #F24328;
+    transition: all 0.2s ease-in-out;
 }
+.new-ticketButton {
+    color: #F24328;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+.dashboard-header-content:hover{
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
 .dashboard-content-header-title{
     flex: 1;
     font-size: 1.5rem;
@@ -17,8 +41,9 @@
 .dashboard-content-header-newTicketButton{
     flex: 1;
     align-self: flex-end;
-    max-width: 40px!important;
-    height: 40px!important;
+    max-width: 30px!important;
+    height: 30px!important;
+    width: 30px!important;
 }
 .dashboard-content-title{
     margin-top: 1rem;
@@ -26,6 +51,10 @@
     font-weight: 600;
     margin-bottom: 1rem;
 }
+.dashboard-content-body{
+    margin-top: 1rem;
+}
+
 .dashboard-content-body-subcontainer {
     display: flex;
     flex-direction: row;
@@ -58,7 +87,7 @@
 .dashboard-content-filter-choices:hover:not(.active){
     background-color: rgba(242, 67, 40, 0.1);
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 .dashboard-content-body-menu{
     text-decoration: none;
