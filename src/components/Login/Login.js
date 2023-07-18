@@ -55,7 +55,7 @@ function Login() {
           if (!user.emailVerified) {
             sendEmailVerification(auth.currentUser).then(() => {
               alert(
-                "Vous n'avez pas confirmé votre adresse mail.\nUn mail vous a été envoyé."
+                "Veuillez vérifier ou revérifier votre e-mail.\nUn e-mail vous a été envoyé pour effectuer cette action."
               );
               return;
             });
