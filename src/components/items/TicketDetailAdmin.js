@@ -49,7 +49,8 @@ function TicketDetailAdmin(props) {
     status: "",
     tag: "",
     ticketID: "",
-    publicID: ""
+    publicID: "",
+    file: "",
   });
   const [names, setNames] = useState([]);
 
@@ -100,11 +101,11 @@ function TicketDetailAdmin(props) {
     if (differencesBtwTicketAndNow.length > 0) {
       handleUpdate("Affecté");
       //New assignation
-      fetch('http://192.168.11.245:8080/affected', {
-        method: 'POST',
+      fetch("http://localhost:8080/affected", { //192.168.11.245
+        method: "POST",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           tag: ticket.tag,
@@ -114,8 +115,9 @@ function TicketDetailAdmin(props) {
           status: "Affecté",
           diff: differencesBtwTicketAndNow,
           affectedTo: ticket.affectedTo,
-          id: ticket.publicID
-        })
+          id: ticket.publicID,
+          filePath: ticket.file,
+        }),
       });
     }
     else if (differencesBtwTicketAndNow.length === 0 && ticket.affectedTo.length === 0) {

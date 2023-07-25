@@ -84,15 +84,20 @@ function NewTicket() {
         nbTickets: increment(1)
       });
       //SEND API REQUEST:
-      fetch('http://192.168.11.245:8080/ticket', {
-        method: 'POST',
+      fetch("http://localhost:8080/ticket", { // 192.168.11.245
+        method: "POST",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tag: tag, object: resume, body: description, from: email, id: id6
-        })
+          tag: tag,
+          object: resume,
+          body: description,
+          from: email,
+          id: id6,
+          file: filePath,
+        }),
       });
         navigate("/dashboard");
     } else {

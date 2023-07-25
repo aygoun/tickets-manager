@@ -24,16 +24,6 @@ function Register() {
     ) {
       alert("Veuillez remplir tous les champs");
     } else {
-      //send api request
-      // const response = await Axios('http://192.168.11.245:8080/mail:' + email);
-      // if (response.data === "KO") {
-      //   alert("Une erreur est survenue, veuillez réessayer");
-      // }
-      // else {
-      //   setVerifiedPassword(response.data);
-      //   handleClickOpen();
-      // }
-      // console.log("Sending request");
       handleAccountCreation();
     }
   };
