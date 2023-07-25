@@ -84,7 +84,7 @@ function NewTicket() {
         nbTickets: increment(1)
       });
       //SEND API REQUEST:
-      fetch("http://localhost:8080/ticket", { // 192.168.11.245
+      fetch("http://192.168.11.245:8080/ticket", {
         method: "POST",
         headers: {
           Accept: "application/json",
