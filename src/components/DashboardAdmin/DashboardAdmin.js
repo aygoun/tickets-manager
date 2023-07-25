@@ -133,7 +133,7 @@ function DashboardAdmin() {
                 console.log(data);
                 if (data.statusText === "OK") {
                   console.log("User deleted from auth");
-                    alert("L'utilisateur ("+ mailToDelete +") et ses données ont été supprimé")
+                    alert("L'utilisateur ("+ mailToDelete +") et ses données ont été supprimés")
                     window.location.reload();
                     handleClose2();
                 } else {

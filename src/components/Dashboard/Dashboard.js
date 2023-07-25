@@ -169,7 +169,7 @@ function Dashboard() {
               src={plusBlack}
               alt="New ticket"
             />
-            <span className="new-ticketButton">New ticket</span>
+            <span className="new-ticketButton">Nouveau ticket</span>
           </div>
         </div>
         <div className="dashboard-content-body">
