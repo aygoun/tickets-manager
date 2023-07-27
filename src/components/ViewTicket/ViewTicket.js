@@ -160,18 +160,20 @@ function ViewTicket(props) {
               <div className="newticket-body-input-container flex1">
                 <Button
                   variant="outlined"
-                  onClick={() => 
-                    window.location.href = "mailto:" +
+                  onClick={() =>
+                    (window.location.href =
+                      "mailto:" +
                       ticket.from +
-                      "?subject=Re:" +
+                      "?subject=Réponse du TicketManager:" +
                       ticket.object +
-                      "&body=" +
-                      ticket.body.replace("\n", "%0D%0A")
+                      "&body=%0D%0A%0D%0A---%0D%0ATicket en question:" +
+                      ticket.body.replace("\n", "%0D%0A"))
                   }
                 >
                   Répondre par email
                 </Button>
-              </div>)}
+              </div>
+            )}
 
             <div className="flex1 newticket-validate-button-container">
               <div className="flex1">
