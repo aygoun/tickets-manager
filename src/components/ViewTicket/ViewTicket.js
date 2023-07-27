@@ -40,9 +40,9 @@ function ViewTicket(props) {
       console.log("Document data:", docSnap.data());
       //convert datestamp date to string
       let date = new Date(docSnap.data().date.seconds * 1000);
-      let dateString = date.toLocaleDateString();
-      let timeString = date.toLocaleTimeString();
-      setDate(dateString + " " + timeString);
+      let dateString = date.toLocaleDateString("fr-FR");
+      let timeString = date.toLocaleTimeString("fr-FR");
+      setDate("Le " + dateString + " à " + timeString);
       setTicket(docSnap.data());
       setAffectedTo(docSnap.data().affectedTo);
     } else {
@@ -70,7 +70,7 @@ function ViewTicket(props) {
   }, [navigate]);
 
   return (
-    <div style={{marginBottom: "2em"}}>
+    <div style={{ marginBottom: "2em" }}>
       <Header isLogout={true} />
       {Object.entries(ticket).length !== 0 && (
         <div className="newticket-maincontainer">
@@ -123,22 +123,22 @@ function ViewTicket(props) {
             </div>
 
             <div className="newticket-body-input-container flex1">
-              <p>Votre ticket est affecté à :
-              {Object.entries(affectedTo).length > 0 ? (
-                  //Ticket AssignedTo is an array, iterates on it
-                  affectedTo.map((technician, index) => (
-                    <span key={index} style={{fontWeight: 600}}>
-                      {" "}{technician},
-                    </span>
-                  ))
-                ) : (
-                  " Aucun technicien")
-              }
+              <p>
+                Le ticket est affecté à :
+                {Object.entries(affectedTo).length > 0
+                  ? //Ticket AssignedTo is an array, iterates on it
+                    affectedTo.map((technician, index) => (
+                      <span key={index} style={{ fontWeight: 600 }}>
+                        {" "}
+                        {technician},
+                      </span>
+                    ))
+                  : " Aucun technicien"}
               </p>
             </div>
 
             <div className="newticket-body-input-container flex1">
-              {ticket.file !== "" ? (  
+              {ticket.file !== "" ? (
                 <a href={ticket.file} target="_blank" rel="noreferrer">
                   <Button
                     variant="outlined"
@@ -148,14 +148,30 @@ function ViewTicket(props) {
                       color: "#fff",
                     }}
                     disabled
-                    >
+                  >
                     Voir le fichier
                   </Button>
-                </a>)
-              :
-                (<p>Aucune pièce jointe</p>)
-              }
+                </a>
+              ) : (
+                <p>Aucune pièce jointe</p>
+              )}
             </div>
+            {isAdmin && (
+              <div className="newticket-body-input-container flex1">
+                <Button
+                  variant="outlined"
+                  onClick={() => 
+                    window.location.href = "mailto:" +
+                      ticket.from +
+                      "?subject=Re:" +
+                      ticket.object +
+                      "&body=" +
+                      ticket.body.replace("\n", "%0D%0A")
+                  }
+                >
+                  Répondre par email
+                </Button>
+              </div>)}
 
             <div className="flex1 newticket-validate-button-container">
               <div className="flex1">
@@ -174,7 +190,9 @@ function ViewTicket(props) {
               <div className="newticket-cancel-button-flex-none">
                 <Button
                   variant="outlined"
-                  onClick={() => {isAdmin ? navigate("/admin") : navigate("/dashboard")}}
+                  onClick={() => {
+                    isAdmin ? navigate("/admin") : navigate("/dashboard");
+                  }}
                 >
                   Retour
                 </Button>
