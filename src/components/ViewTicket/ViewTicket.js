@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Header from "../items/Header";
 import "./ViewTicket.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -164,7 +164,7 @@ function ViewTicket(props) {
                     (window.location.href =
                       "mailto:" +
                       ticket.from +
-                      "?subject=[Réponse du TicketManager]" +
+                      "?subject=[Réponse du TicketManager] " +
                       ticket.object +
                       "&body=%0D%0A%0D%0A---%0D%0A" +
                       ticket.body.replace("\n", "%0D%0A"))
