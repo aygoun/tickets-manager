@@ -85,7 +85,6 @@ function DashboardAdmin() {
     { label: "Public ID", key: "publicID" },
     { label: "Tag", key: "tag" },
     { label: "Résumé", key: "object" },
-    { label: "Détails", key: "body" },
     { label: "Statut", key: "status" },
     { label: "Date", key: "date" },
     { label: "Affecté à", key: "affectedTo" },
@@ -99,11 +98,20 @@ function DashboardAdmin() {
     getDocs(q).then((querySnapshot) => {
       var tickets = [];
       querySnapshot.forEach((doc) => {
-        console.log("Doc: " + doc.data());
-        tickets.push(doc.data());
+        var object = doc.data().object.replace(/,/g, "");
+        const data = {
+          from: doc.data().from,
+          publicID: doc.data().publicID,
+          tag: doc.data().tag,
+          object: object,
+          status: doc.data().status,
+          date: doc.data().date,
+          affectedTo: doc.data().affectedTo.join(", "),
+          ticketID: doc.data().ticketID,
+        };
+        tickets.push(data);
       });
       setCsvData(tickets);
-      console.log("TEST");
     });
   };
 
@@ -127,10 +135,8 @@ function DashboardAdmin() {
         await getDoc(q).then((doc) => {
           if (doc.exists()) {
             //DELETE USER FROM AUTH
-            console.log(doc.data().uid);
             fetch("http://192.168.11.245:8080/delete/:" + doc.data().uid+"/:"+mailToDelete)
               .then((data) => {
-                console.log(data);
                 if (data.statusText === "OK") {
                   console.log("User deleted from auth");
                     alert("L'utilisateur ("+ mailToDelete +") et ses données ont été supprimés")
@@ -176,7 +182,6 @@ function DashboardAdmin() {
         },
       })
       .then((response) => {
-        console.log(response.data);
         setOpen(response.data.open);
         setClosed(response.data.closed);
         setAffected(response.data.affected);
@@ -191,7 +196,7 @@ function DashboardAdmin() {
     setAllTickets(ticketsIDs);
     setDisplayedTickets(ticketsIDs);
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
-    console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
+    // console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
   };
 
   const fetchTickets = async (statusChanged) => {
@@ -307,7 +312,7 @@ function DashboardAdmin() {
       setAllTickets(ticketsIDs);
       setDisplayedTickets(ticketsIDs);
       setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
+      // console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
     }
   };
 
@@ -422,7 +427,7 @@ function DashboardAdmin() {
       setAllTickets(allTickets.concat(ticketsIDs));
       setDisplayedTickets(displayedTickets.concat(ticketsIDs));
       setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
+      // console.log("Docs: ", ticketsIDs.map((ticket) => ticket));
     }
   };
 
@@ -531,7 +536,7 @@ function DashboardAdmin() {
       <div className="dashboard-admin-container">
         <div className="dashboard-admin-header-content">
           <div className="dashboard-content-header-title">
-           MODE ADMINISTRATEUR
+            MODE ADMINISTRATEUR
           </div>
           <div className="dashboard-admin-actions-container">
             {userEmail === "ticketmanager@festival-aix.com" ? (
@@ -614,7 +619,7 @@ function DashboardAdmin() {
                     data={csvData}
                     headers={headers}
                     separator={";"}
-                    filename={"tickets.csv"}
+                    filename={"TicketManager.csv"}
                     style={{ marginLeft: "1rem" }}
                   >
                     <Button variant="contained" onclick={handleClose}>
@@ -633,7 +638,7 @@ function DashboardAdmin() {
                 value={search}
                 onChange={(e) => handleSearchChange(e)}
               />
-            </div> 
+            </div>
           </div>
           <div className="dashboard-content-body-subcontainer">
             <div className="dashboard-content-body-filtermenu-main">
@@ -792,13 +797,13 @@ function DashboardAdmin() {
                 <p className="dashboard-switch-text">
                   Afficher mes affectations
                 </p>
-                <label for="myCheck" className="switch">
+                <label htmlFor="myCheck" className="switch">
                   <input
                     type="checkbox"
                     id="myCheck"
                     onClick={() => handleMyAffectation(!myAffectation)}
                   />
-                  <span class="slider round"></span>
+                  <span className="slider round"></span>
                 </label>
               </div>
             </div>

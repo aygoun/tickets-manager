@@ -126,7 +126,6 @@ function TicketDetailAdmin(props) {
   };
 
   const fetchTicket = async () => {
-    console.log("Fetching ticket...");
     //Fetch ticket with id ticketID
     onSnapshot(doc(db, "tickets", ticketID), (doc) => {
       setTicket(doc.data());

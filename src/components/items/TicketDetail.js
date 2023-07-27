@@ -6,8 +6,6 @@ import { db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
-
-
 function TicketDetail(props) {
   let navigate = useNavigate();
   const ticket = props.ticket;
